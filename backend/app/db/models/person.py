@@ -5,7 +5,7 @@ from sqlalchemy import Date, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.db.enums import PersonStatus, db_enum
+from app.db.enums import DataState, PersonStatus, db_enum
 from app.db.mixins import ProvenanceMixin
 
 
@@ -19,4 +19,9 @@ class Person(ProvenanceMixin, Base):
     area_code: Mapped[str | None] = mapped_column(String(20))
     status: Mapped[PersonStatus] = mapped_column(
         db_enum(PersonStatus, "person_status"), default=PersonStatus.ACTIVE
+    )
+    family_history_state: Mapped[DataState] = mapped_column(
+        db_enum(DataState, "family_history_state"),
+        default=DataState.NOT_COLLECTED,
+        server_default=DataState.NOT_COLLECTED.value,
     )

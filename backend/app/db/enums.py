@@ -49,3 +49,20 @@ def db_enum(enum_cls: type[enum.Enum], name: str) -> Enum:
         length=30,
         values_callable=lambda e: [m.value for m in e],
     )
+
+class ConditionContext(str, enum.Enum):
+    PERSONAL = "personal"
+    FAMILY_HISTORY = "family_history"
+
+
+class ConditionStatus(str, enum.Enum):
+    ACTIVE = "active"
+    RESOLVED = "resolved"
+    INACTIVE = "inactive"
+
+
+class ScreeningStatus(str, enum.Enum):
+    PENDING = "pending"
+    COMPLETED = "completed"
+    DECLINED = "declined"
+    MISSED = "missed"
