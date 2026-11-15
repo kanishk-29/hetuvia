@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.adapters.synthetic_generator import SOURCE, Population, generate_population
 from app.db.models import (
-    Condition,
+    Condition, DataQualityFinding,
     Encounter,
     FamilyRelationship,
     ImportBatch,
@@ -16,7 +16,7 @@ from app.db.models import (
 
 def reset_source(db: Session, source_system: str) -> None:
     """Delete everything one source loaded, children first so foreign keys stay valid."""
-    for model in (Observation, ScreeningEvent, Condition, Encounter, FamilyRelationship, Person):
+    for model in (DataQualityFinding, Observation, ScreeningEvent, Condition, Encounter, FamilyRelationship, Person):
         db.execute(delete(model).where(model.source_system == source_system))
     batch_ids = select(ImportBatch.id).where(ImportBatch.source_system == source_system)
     db.execute(delete(ImportRejection).where(ImportRejection.batch_id.in_(batch_ids)))
