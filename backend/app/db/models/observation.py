@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Numeric, String
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -16,6 +16,7 @@ class Observation(ProvenanceMixin, Base):
         # A value exists if and only if the state says "present".
         CheckConstraint("(value_state = 'present') = (value_numeric IS NOT NULL)", name="value_matches_state"),
         CheckConstraint("value_numeric IS NULL OR unit IS NOT NULL", name="value_has_unit"),
+        UniqueConstraint("source_system", "source_record_id"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)

@@ -66,3 +66,8 @@ class ScreeningStatus(str, enum.Enum):
     COMPLETED = "completed"
     DECLINED = "declined"
     MISSED = "missed"
+
+class ImportStatus(str, enum.Enum):
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"

@@ -1,7 +1,7 @@
 import uuid
 from datetime import date
 
-from sqlalchemy import Date, String
+from sqlalchemy import Date, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -11,6 +11,7 @@ from app.db.mixins import ProvenanceMixin
 
 class Person(ProvenanceMixin, Base):
     __tablename__ = "people"
+    __table_args__ = (UniqueConstraint("source_system", "source_record_id"),)
 
     person_id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     date_of_birth: Mapped[date | None] = mapped_column(Date)  # NULL = unknown

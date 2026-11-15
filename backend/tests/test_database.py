@@ -55,7 +55,7 @@ def test_unknown_observation_stores_no_value(db):
         value_state=DataState.UNKNOWN, source_system="synthetic",
     ))
     db.flush()
-    saved = db.query(Observation).one()
+    saved = db.query(Observation).filter(Observation.person_id == person.person_id).one()
     assert saved.value_numeric is None
     assert saved.value_state == DataState.UNKNOWN
 
@@ -106,3 +106,4 @@ def test_personal_condition_cannot_name_a_relative(db):
     ))
     with pytest.raises(IntegrityError):
         db.flush()
+
