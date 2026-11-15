@@ -8,3 +8,5 @@ node_modules/
 .next/
 ml/data/
 *.csv
+
+!backend/sample_import/*.csv

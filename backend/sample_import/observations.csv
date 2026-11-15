@@ -1,0 +1,13 @@
+source_record_id,person_source_id,encounter_source_id,observation_type,value,unit,value_state,observed_at
+O-001,P-001,E-001,weight,20.5,kg,present,2026-03-10
+O-002,P-001,E-001,height,,,not_collected,2026-03-10
+O-003,P-002,E-003,weight,45,lb,present,2026-04-02
+O-004,P-002,E-003,height,150,cm,present,2026-04-02
+O-005,P-002,E-003,weight,,,unknown,2026-04-02
+O-006,P-002,E-003,systolic_blood_pressure,120,mmHg,unknown,2026-04-02
+O-007,P-001,E-777,weight,21,kg,present,2026-06-15
+O-008,P-001,E-003,weight,21,kg,present,2026-06-15
+O-009,P-002,,weight,,,present,2026-05-01
+O-010,P-002,,mystery,5,kg,present,2026-05-01
+O-001,P-002,,weight,30,kg,present,2026-05-01
+O-011,P-008,E-007,weight,70,kg,present,2026-07-07

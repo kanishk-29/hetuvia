@@ -1,0 +1,10 @@
+source_record_id,date_of_birth,sex_recorded,preferred_language,area_code,family_history_state
+P-001,2015-03-01,female,en,AREA-A,present
+P-002,2012-07-19,male,ar,AREA-A,unknown
+P-003,,female,hi,AREA-B,not_collected
+P-004,01/02/2020,male,en,AREA-B,unknown
+P-005,2031-01-01,female,en,AREA-C,unknown
+P-006,1980-05-05,male,en,AREA-C,maybe
+P-007,1975-09-09,female,ur,AREA-A,
+P-001,1999-01-01,male,en,AREA-A,unknown
+P-008,1990-10-10,female,en,AREA-C,explicitly_absent

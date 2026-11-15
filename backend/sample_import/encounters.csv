@@ -1,0 +1,9 @@
+source_record_id,person_source_id,encounter_type,encounter_date,status
+E-001,P-001,demo_well_child_visit,2026-03-10,completed
+E-002,P-001,demo_clinic_visit,2026-06-15,no_show
+E-003,P-002,demo_clinic_visit,2026-04-02,completed
+E-004,P-999,demo_clinic_visit,2026-04-02,completed
+E-005,P-003,demo_clinic_visit,2026-13-45,completed
+E-006,P-008,demo_clinic_visit,2026-05-05,happened
+E-001,P-002,demo_clinic_visit,2026-05-06,completed
+E-007,P-008,demo_clinic_visit,2026-07-07,completed

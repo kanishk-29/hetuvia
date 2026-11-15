@@ -1,4 +1,4 @@
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.adapters.synthetic_generator import SOURCE, Population, generate_population
@@ -6,16 +6,25 @@ from app.db.models import (
     Condition,
     Encounter,
     FamilyRelationship,
+    ImportBatch,
+    ImportRejection,
     Observation,
     Person,
     ScreeningEvent,
 )
 
 
-def reset_synthetic(db: Session) -> None:
-    """Delete only synthetic rows, children first so foreign keys stay valid."""
+def reset_source(db: Session, source_system: str) -> None:
+    """Delete everything one source loaded, children first so foreign keys stay valid."""
     for model in (Observation, ScreeningEvent, Condition, Encounter, FamilyRelationship, Person):
-        db.execute(delete(model).where(model.source_system == SOURCE))
+        db.execute(delete(model).where(model.source_system == source_system))
+    batch_ids = select(ImportBatch.id).where(ImportBatch.source_system == source_system)
+    db.execute(delete(ImportRejection).where(ImportRejection.batch_id.in_(batch_ids)))
+    db.execute(delete(ImportBatch).where(ImportBatch.source_system == source_system))
+
+
+def reset_synthetic(db: Session) -> None:
+    reset_source(db, SOURCE)
 
 
 def seed_database(
