@@ -1,0 +1,38 @@
+{
+  "rule_set": "demo_rules_v1",
+  "label": "DEMONSTRATION RULES: placeholders for software testing. Not an Abu Dhabi guideline and not clinical advice.",
+  "rules": [
+    {
+      "rule_id": "DEMO-WCV",
+      "version": "1",
+      "title": "Demonstration well-child visit",
+      "service_type": "demo_well_child_visit",
+      "status": "demonstration",
+      "min_age_years": 0,
+      "max_age_years": 17,
+      "interval_days": 365,
+      "lead_days": 60,
+      "grace_days": 30,
+      "exclusions": ["inactive_person"],
+      "effective_from": "2021-01-01",
+      "effective_to": null,
+      "source": "DEMONSTRATION placeholder invented for software testing; not an Abu Dhabi guideline"
+    },
+    {
+      "rule_id": "DEMO-ADULT-SCREEN",
+      "version": "1",
+      "title": "Demonstration adult screening",
+      "service_type": "demo_adult_screening",
+      "status": "demonstration",
+      "min_age_years": 30,
+      "max_age_years": 74,
+      "interval_days": 730,
+      "lead_days": 60,
+      "grace_days": 30,
+      "exclusions": ["inactive_person"],
+      "effective_from": "2021-01-01",
+      "effective_to": null,
+      "source": "DEMONSTRATION placeholder invented for software testing; not an Abu Dhabi guideline"
+    }
+  ]
+}

@@ -76,3 +76,16 @@ class Severity(str, enum.Enum):
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
+
+
+class RuleStatus(str, enum.Enum):
+    DEMONSTRATION = "demonstration"
+    APPROVED = "approved"
+
+
+class CareGapOutcome(str, enum.Enum):
+    OVERDUE = "overdue"
+    DUE = "due"
+    UP_TO_DATE = "up_to_date"
+    NOT_ELIGIBLE = "not_eligible"
+    NOT_ASSESSABLE = "not_assessable"
