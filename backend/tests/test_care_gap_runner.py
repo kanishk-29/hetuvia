@@ -129,3 +129,6 @@ def test_report_errors_are_clear(db):
     db.add(Person(source_system="cg_empty", source_record_id="E-1"))
     db.flush()
     assert "care-gap-check" in format_care_gap_person_report(db, "cg_empty", "E-1")
+
+
+    

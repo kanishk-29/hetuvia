@@ -89,3 +89,22 @@ class CareGapOutcome(str, enum.Enum):
     UP_TO_DATE = "up_to_date"
     NOT_ELIGIBLE = "not_eligible"
     NOT_ASSESSABLE = "not_assessable"
+
+
+class RecommendationKind(str, enum.Enum):
+    SERVICE = "service"
+    INFORMATION = "information"
+
+
+class OutreachPriority(str, enum.Enum):
+    CONTACT_NOW = "contact_now"
+    REVIEW_DATA_FIRST = "review_data_first"
+    ROUTINE = "routine"
+
+
+class RecommendationStatus(str, enum.Enum):
+    PENDING_REVIEW = "pending_review"
+    APPROVED = "approved"
+    DEFERRED = "deferred"
+    REJECTED = "rejected"
+    CLOSED = "closed"
