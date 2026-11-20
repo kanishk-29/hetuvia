@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HETUVIA frontend
 
-## Getting Started
+Minimal Next.js 16.4.6 / React 19.3.0 health-status page for the HETUVIA prototype.
 
-First, run the development server:
+## Current scope
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Displays the result of `GET http://localhost:8000/api/v1/health`.
+- Override the API base URL with `NEXT_PUBLIC_API_URL` if it is not on port 8000.
+- No clinical workflows live here. The interactive prototype is the static demo at [`../docs/demo/index.html`](../docs/demo/index.html).
+
+## Commands
+
+```powershell
+npm install
+npm run dev     # http://localhost:3000
+npm run build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Contributor note
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Follow [`AGENTS.md`](AGENTS.md) in this folder. When writing frontend code, first read the relevant Next.js 16.4.6 guides under `node_modules/next/dist/docs/`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The HTTP interface is specified in [`../docs/srs.md`](../docs/srs.md) section 7.2. Clinical API endpoints are currently out of scope.

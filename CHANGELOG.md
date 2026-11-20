@@ -1,0 +1,23 @@
+# Changelog
+
+All notable changes to HETUVIA are documented here. The format follows Keep a Changelog conventions.
+
+## [Unreleased]
+
+### Changed
+
+- `docs/demo/index.html` is now the real HETUVIA demo. The previous unrelated LearnVault template and the duplicate `indexx.html` filename were removed.
+- `backend/requirements.txt` was converted from UTF-16LE with BOM to UTF-8 without BOM. All pinned versions are unchanged.
+- `README.md` was written as the main project guide.
+- `docs/srs.md` was added as the as-built baseline specification for commit `5a6d9d7`.
+
+### Added
+
+- Short stubs for `docs/product_scope.md`, `docs/api_contract.md` and `docs/rule_catalogue.md` that point to the relevant SRS sections.
+- `docs/demo/README.md` describing the demo entry point and data regeneration command.
+- A HETUVIA-specific `frontend/README.md`, replacing the `create-next-app` boilerplate.
+
+## [Baseline] - 2026-11-20
+
+- Commits `b372add` through `5a6d9d7` delivered the prototype described in `docs/srs.md`.
+- 125 automated backend tests passing at the baseline.

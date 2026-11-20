@@ -1,287 +1,643 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LearnVault — Your Second Brain</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HETUVIA – Preventive care coordination (prototype)</title>
+<style>
+:root{--bg:#f3f6f8;--card:#fff;--ink:#1c2b36;--muted:#5b6c79;--line:#dde5ea;--teal:#0f766e;--teal-d:#0b5a54;--teal-s:#dff3f0;
+--amber:#92400e;--amber-s:#fef3c7;--violet:#5b21b6;--violet-s:#ede9fe;--green:#166534;--green-s:#dcfce7;--red:#b42318;--red-s:#fee4e2;
+--blue:#1d4ed8;--blue-s:#dbeafe;--slate:#475569;--slate-s:#e8edf1}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+a{color:var(--teal-d)}
+.banner{background:#102a43;color:#e6f0f7;font-size:12.5px;text-align:center;padding:6px 12px}
+header.top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top-in{max-width:1220px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:10px 20px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:.09em;color:var(--teal-d);font-size:19px;line-height:1.1}
+.brand small{display:block;font-weight:500;letter-spacing:0;color:var(--muted);font-size:11px;margin-top:2px}
+nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+nav a{padding:7px 12px;border-radius:8px;text-decoration:none;color:var(--slate);font-weight:600;font-size:14px}
+nav a:hover{background:var(--slate-s)}
+nav a.on{background:var(--teal-s);color:var(--teal-d)}
+.role{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+select,input[type=text],textarea{font:inherit;padding:7px 10px;border:1px solid #c5d1d9;border-radius:8px;background:#fff;color:var(--ink)}
+textarea{width:100%;min-height:72px;resize:vertical}
+main{max-width:1220px;margin:0 auto;padding:22px 20px 60px}
+h1{font-size:24px;margin:0 0 4px}
+h2{font-size:17px;margin:0 0 10px}
+h3{font-size:15px;margin:14px 0 6px}
+.sub{color:var(--muted);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.kpis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi b{display:block;font-size:26px;line-height:1.15}
+.kpi span{color:var(--muted);font-size:12.5px}
+.chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.chip.amber{background:var(--amber-s);color:var(--amber)}.chip.violet{background:var(--violet-s);color:var(--violet)}
+.chip.slate{background:var(--slate-s);color:var(--slate)}.chip.green{background:var(--green-s);color:var(--green)}
+.chip.red{background:var(--red-s);color:var(--red)}.chip.blue{background:var(--blue-s);color:var(--blue)}.chip.teal{background:var(--teal-s);color:var(--teal-d)}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#fafcfd}
+tr.clickable{cursor:pointer}tr.clickable:hover td{background:#f5fbfa}
+table.kv td:first-child{color:var(--muted);width:38%}
+table.kv td{border-bottom:1px dashed var(--line);padding:5px 6px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.btn{font:inherit;font-weight:700;border:1px solid var(--teal);background:var(--teal);color:#fff;padding:8px 14px;border-radius:9px;cursor:pointer}
+.btn:hover{background:var(--teal-d)}
+.btn.ghost{background:#fff;color:var(--teal-d)}.btn.ghost:hover{background:var(--teal-s)}
+.btn.warn{background:#fff;color:var(--amber);border-color:#d9a441}.btn.danger{background:#fff;color:var(--red);border-color:#e0a09a}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:4px 10px;font-size:13px}
+.split{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
+@media(max-width:860px){.split{grid-template-columns:1fr}}
+.list{max-height:640px;overflow:auto}
+.item{padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.item:hover{background:#f5fbfa}.item.sel{background:var(--teal-s)}
+.item small{color:var(--muted);display:block}
+.note{background:#f8fafb;border-left:4px solid var(--teal);padding:9px 12px;border-radius:6px;margin:8px 0;font-size:14px}
+.note.warn{border-color:#d9a441;background:#fffaf0}.note.viol{border-color:#8b5cf6;background:#faf7ff}
+.muted{color:var(--muted)}.small{font-size:13px}
+.bar{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:14px}
+.bar .lab{width:150px;color:var(--slate)}
+.bar .track{flex:1;background:var(--slate-s);border-radius:6px;height:20px;overflow:hidden}
+.bar .fill{height:100%;background:var(--teal);border-radius:6px}
+.bar .val{width:48px;text-align:right;font-weight:700}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+.step{padding:5px 11px;border-radius:999px;background:var(--slate-s);color:var(--slate);font-size:13px;font-weight:700}
+.step.done{background:var(--green-s);color:var(--green)}.step.now{background:var(--teal);color:#fff}
+.tl{border-left:3px solid var(--line);margin-left:6px;padding-left:14px}
+.tl .ev{position:relative;padding:5px 0 8px}
+.tl .ev:before{content:"";position:absolute;left:-21px;top:11px;width:10px;height:10px;border-radius:50%;background:#9db3c0}
+.tl .ev.miss:before{background:#8b5cf6}
+.tl .d{font-weight:700;font-size:13px;color:var(--slate)}
+.pager{display:flex;gap:10px;align-items:center;margin-top:10px}
+.empty{color:var(--muted);padding:18px;text-align:center}
+pre{background:#f6f8fa;border:1px solid var(--line);padding:10px;border-radius:8px;overflow:auto;font-size:12px;max-height:260px}
+footer{max-width:1220px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:12.5px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#102a43;color:#fff;padding:10px 16px;border-radius:10px;display:none;z-index:20;max-width:90vw}
+#toast.bad{background:var(--red)}
+.msg{background:#f3f8ff;border:1px dashed #9dbbe8;border-radius:10px;padding:10px 12px;white-space:pre-wrap;font-size:14px}
+label.inline{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:14px}
+.slot{display:inline-block;margin:4px 6px 4px 0}
+.slot input{margin-right:5px}
+</style>
 </head>
 <body>
+<div class="banner">PROTOTYPE &middot; 100% fictional data &middot; Demonstration rules, not an Abu Dhabi guideline &middot; Not clinical advice &middot; Guest access, no login</div>
+<header class="top"><div class="top-in">
+  <div class="brand">HETUVIA<small>Population health intelligence &amp; preventive care coordination</small></div>
+  <nav id="nav"></nav>
+  <div class="role"><label for="role">Viewing as</label><select id="role"></select></div>
+</div></header>
+<main id="app"><div class="card">Loading&hellip;</div></main>
+<footer>HETUVIA is a competition prototype. Every person, record and result shown is fictional. Rules are demonstration placeholders. HETUVIA coordinates preventive care and does not diagnose; a human reviewer stays responsible for every decision. Nothing is sent to anyone.</footer>
+<div id="toast"></div>
+<noscript>This page needs JavaScript.</noscript>
+<script src="data.js"></script>
+<script>
+(function () {
+'use strict';
+const D = window.HETUVIA_DATA;
+const app = document.getElementById('app');
+if (!D) { app.innerHTML = '<div class="card"><h2>Data file not found</h2><p>data.js must sit next to index.html. See the README for the export command.</p></div>'; return; }
 
-<div class="app">
+/* ---------- constants ---------- */
+const EVAL = new Date(D.meta.evaluated_on + 'T00:00:00Z');
+const MIN_CELL = 5, MIN_DENOM = 10, PAGE = 25;
+const PRIORITY = {
+  contact_now: { label: 'Contact now', cls: 'amber', rank: 0 },
+  review_data_first: { label: 'Review data first', cls: 'violet', rank: 1 },
+  routine: { label: 'Routine', cls: 'slate', rank: 2 }
+};
+const STATUS = {
+  pending_review: { label: 'Pending review', cls: 'slate' }, approved: { label: 'Approved', cls: 'green' },
+  deferred: { label: 'Deferred', cls: 'amber' }, rejected: { label: 'Rejected', cls: 'red' },
+  closed: { label: 'Closed (gap closed)', cls: 'blue' }, completed: { label: 'Completed', cls: 'blue' }
+};
+const STAGES = ['not_started', 'invited', 'booked', 'attended', 'completed'];
+const STAGE_LABEL = { not_started: 'Approved', invited: 'Invited', booked: 'Booked', attended: 'Attended', missed: 'Missed (recall)', completed: 'Completed' };
+const STATE_TEXT = {
+  present: 'Present', explicitly_absent: 'Explicitly absent (documented)', unknown: 'Unknown \u2014 not recorded',
+  not_collected: 'Not collected', not_applicable: 'Not applicable', stale: 'Stale'
+};
+const OBS_LABEL = { height: 'Height', weight: 'Weight', systolic_blood_pressure: 'Systolic blood pressure' };
+const ROLES = {
+  guest: { label: 'Guest (all features)', actor: 'Guest user', can: { review: 1, outreach: 1, reset: 1 } },
+  reviewer: { label: 'Clinical reviewer', actor: 'Dr Demo Reviewer', can: { review: 1 } },
+  coordinator: { label: 'Outreach coordinator', actor: 'Sam Demo Coordinator', can: { outreach: 1 } },
+  analyst: { label: 'Population health analyst', actor: 'Analyst Demo', can: {} },
+  admin: { label: 'System administrator', actor: 'Admin Demo', can: { reset: 1 } }
+};
+const NAV = [['overview', 'Overview'], ['queue', 'Work queue'], ['review', 'Recommendation review'], ['outreach', 'Outreach & appointments'], ['insights', 'Community insights'], ['audit', 'Audit log'], ['about', 'About & safeguards']];
 
-  <!-- Mobile top bar -->
-  <header class="mobile-bar">
-    <button class="icon-btn" id="menuToggle" aria-label="Open menu">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    </button>
-    <div class="mobile-brand">
-      <span class="brand-mark">V</span>
-      <span>LearnVault</span>
-    </div>
-    <button class="icon-btn" id="themeToggleMobile" aria-label="Toggle theme">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-    </button>
-  </header>
+/* ---------- helpers ---------- */
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const chip = (t, c) => '<span class="chip ' + (c || 'slate') + '">' + esc(t) + '</span>';
+const nice = s => { s = String(s || '').replace(/^demo_/, '').replace(/_/g, ' '); return s.charAt(0).toUpperCase() + s.slice(1); };
+const short = t => String(t || '').replace(/ \(demonstration\)$/, '');
+const stateText = s => STATE_TEXT[s] || nice(s);
+function ageOn(dob) {
+  if (!dob) return null;
+  const y = +dob.slice(0, 4), m = +dob.slice(5, 7), d = +dob.slice(8, 10);
+  let a = EVAL.getUTCFullYear() - y;
+  const em = EVAL.getUTCMonth() + 1, ed = EVAL.getUTCDate();
+  if (em < m || (em === m && ed < d)) a--;
+  return a;
+}
+const kv = rows => '<table class="kv">' + rows.map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + (r[2] ? r[1] : esc(r[1] == null ? '\u2014' : r[1])) + '</td></tr>').join('') + '</table>';
+const cell = n => (n > 0 && n < MIN_CELL) ? '<' + MIN_CELL : String(n);
+const rate = (n, d) => d < MIN_DENOM ? 'n/a (n<' + MIN_DENOM + ')' : (n > 0 && n < MIN_CELL) ? 'suppressed' : Math.round(100 * n / d) + '%';
+const rateNum = (n, d) => (d < MIN_DENOM || (n > 0 && n < MIN_CELL)) ? null : 100 * n / d;
+function toast(msg, bad) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = bad ? 'bad' : ''; t.style.display = 'block';
+  clearTimeout(toast.h); toast.h = setTimeout(() => { t.style.display = 'none'; }, 3200);
+}
 
-  <div class="scrim" id="scrim"></div>
+/* ---------- data ---------- */
+const PEOPLE = D.people, BY_ID = {}, RECS = [], REC = {};
+PEOPLE.forEach(p => {
+  BY_ID[p.id] = p; p.age = ageOn(p.dob);
+  p.recs.forEach(r => { r.pid = p.id; RECS.push(r); REC[r.id] = r; });
+});
+const AREAS = Array.from(new Set(PEOPLE.map(p => p.area))).sort();
+const LANGS = Array.from(new Set(PEOPLE.map(p => p.language || 'unknown'))).sort();
 
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-mark">V</div>
-      <div class="brand-text">
-        <span class="brand-name">LearnVault</span>
-        <span class="brand-tag">Second Brain, Ledgered</span>
-      </div>
-    </div>
+/* ---------- state (kept in this browser only) ---------- */
+const KEY = 'hetuvia-demo-state-v3';
+const blank = () => ({ sig: D.meta.generated_at, role: 'guest', decisions: {}, outreach: {}, audit: [] });
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
+if (!S || S.sig !== D.meta.generated_at || !ROLES[S.role]) S = blank();
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage may be blocked; the demo still works */ } };
+const F = { area: 'all', q: '', priority: 'all', kind: 'all', status: 'all', page: 0, rpriority: 'all', reviewSel: null, outSel: null };
 
-    <nav class="sidebar-nav">
-      <a href="#dashboard" class="nav-link" data-route="dashboard">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="12" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="16" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
-        <span>Dashboard</span>
-      </a>
-      <a href="#topics" class="nav-link" data-route="topics">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        <span>Topics</span>
-      </a>
-    </nav>
+const can = a => !!ROLES[S.role].can[a];
+const whoNow = () => ({ actor: ROLES[S.role].actor, role: ROLES[S.role].label });
+function logAudit(w, action, r, detail) {
+  S.audit.push({ t: new Date().toISOString(), actor: w.actor, role: w.role, action: action, rec: r ? r.id : null, pid: r ? r.pid : null, detail: detail || '' });
+}
+function recStatus(r) {
+  const o = S.outreach[r.id];
+  if (o && o.completedAt) return 'completed';
+  const d = S.decisions[r.id];
+  return d ? d.status : r.status;
+}
+const isOpen = r => { const s = recStatus(r); return s === 'pending_review' || s === 'approved' || s === 'deferred'; };
+function stageOf(r) {
+  const o = S.outreach[r.id];
+  if (!o) return 'not_started';
+  if (o.completedAt) return 'completed';
+  if (o.attendance === 'attended') return 'attended';
+  if (o.attendance === 'missed') return 'missed';
+  if (o.booking) return 'booked';
+  if (o.invitedAt) return 'invited';
+  return 'not_started';
+}
+const topPriority = list => list.reduce((best, r) => (!best || PRIORITY[r.priority].rank < PRIORITY[best].rank) ? r.priority : best, null);
 
-    <div class="sidebar-search">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <input type="text" id="globalSearch" placeholder="Search the vault…" autocomplete="off">
-    </div>
-    <div id="searchResults" class="search-results hidden"></div>
+/* ---------- workflow actions (each returns an error string or null) ---------- */
+function doDecision(r, decision, note, w) {
+  const st = recStatus(r);
+  if (st !== 'pending_review' && st !== 'deferred') return 'This recommendation is ' + STATUS[st].label.toLowerCase() + ' and cannot be reviewed.';
+  note = (note || '').trim();
+  if ((decision === 'defer' || decision === 'reject') && !note) return 'A note is required to defer or reject.';
+  S.decisions[r.id] = { status: { approve: 'approved', defer: 'deferred', reject: 'rejected' }[decision], reviewer: w.actor, note: note, at: new Date().toISOString() };
+  logAudit(w, 'recommendation_' + decision, r, note ? 'Note: ' + note : '');
+  save(); return null;
+}
+function doInvite(r, channel, consent, w) {
+  if (recStatus(r) !== 'approved') return 'Only approved recommendations can be followed up.';
+  if (stageOf(r) !== 'not_started') return 'An invitation already exists.';
+  if (!consent) return 'Confirm the consent and contact-preference check first.';
+  const now = new Date().toISOString(), p = BY_ID[r.pid];
+  S.outreach[r.id] = { channel: channel, language: p.language || null, consentAt: now, invitedAt: now,
+    events: [{ t: now, type: 'Invitation (simulated)', detail: channel + ' - nothing was sent' }] };
+  logAudit(w, 'invitation_simulated', r, channel); save(); return null;
+}
+function doBook(r, slot, w) {
+  const st = stageOf(r), o = S.outreach[r.id];
+  if (st !== 'invited' && st !== 'missed') return 'Send an invitation first.';
+  if (!slot) return 'Choose a slot.';
+  const now = new Date().toISOString();
+  o.booking = { slot: slot }; o.bookedAt = o.bookedAt || now; o.attendance = null;
+  o.events.push({ t: now, type: 'Appointment booked (simulated)', detail: slot });
+  logAudit(w, 'appointment_booked', r, slot); save(); return null;
+}
+function doAttendance(r, result, w) {
+  const o = S.outreach[r.id];
+  if (stageOf(r) !== 'booked') return 'Book an appointment first.';
+  const now = new Date().toISOString();
+  if (result === 'attended') {
+    o.attendance = 'attended'; o.attendedAt = now;
+    o.events.push({ t: now, type: 'Attended', detail: o.booking.slot });
+  } else {
+    o.attendance = 'missed'; o.missedCount = (o.missedCount || 0) + 1;
+    o.events.push({ t: now, type: 'Missed - recall started', detail: o.booking.slot });
+    o.booking = null;
+  }
+  logAudit(w, 'attendance_' + result, r, ''); save(); return null;
+}
+function doComplete(r, w) {
+  const o = S.outreach[r.id];
+  if (stageOf(r) !== 'attended') return 'The person must attend first.';
+  const now = new Date().toISOString();
+  o.completedAt = now; o.events.push({ t: now, type: 'Service completed and recorded', detail: 'Gap closed' });
+  logAudit(w, 'service_completed', r, 'Recommendation closed by completion'); save(); return null;
+}
+function runScenario() {
+  S = blank(); save();
+  const w = { actor: 'Demo script', role: 'Scripted demo' };
+  const by = (a, b) => a.pid < b.pid ? -1 : a.pid > b.pid ? 1 : 0;
+  const service = RECS.filter(r => r.kind === 'service' && r.priority === 'contact_now').sort(by);
+  const info = RECS.filter(r => r.kind === 'information').sort(by);
+  const slots = makeSlots();
+  service.slice(0, 40).forEach((r, i) => {
+    doDecision(r, 'approve', '', w);
+    if (i < 32) doInvite(r, i % 3 === 0 ? 'Phone call' : 'SMS', true, w);
+    if (i < 26) doBook(r, slots[i % slots.length].value, w);
+    if (i < 22) {
+      if (i % 6 === 5) { doAttendance(r, 'missed', w); if (i % 12 === 5) doBook(r, slots[(i + 2) % slots.length].value, w); }
+      else doAttendance(r, 'attended', w);
+    }
+    if (i < 16 && S.outreach[r.id] && S.outreach[r.id].attendance === 'attended') doComplete(r, w);
+  });
+  service.slice(40, 46).forEach((r, i) => { if (i < 3) doDecision(r, 'defer', 'Waiting for the family to confirm availability.', w); else if (i < 5) doDecision(r, 'reject', 'Duplicate of an existing booking.', w); else doDecision(r, 'approve', '', w); });
+  info.slice(0, 12).forEach(r => doDecision(r, 'approve', '', w));
+  save();
+}
+function makeSlots() {
+  const out = [], times = ['09:00', '11:30', '14:00'];
+  const d = new Date(EVAL.getTime() + 7 * 86400000);
+  while (out.length < 9) {
+    const wd = d.getUTCDay();
+    if (wd !== 0 && wd !== 6) { // simulated clinic works Monday to Friday
+      times.forEach(t => { if (out.length < 9) { const iso = d.toISOString().slice(0, 10); out.push({ value: iso + ' ' + t, label: d.toUTCString().slice(0, 11) + ' ' + t }); } });
+    }
+    d.setUTCDate(d.getUTCDate() + 1);
+  }
+  return out;
+}
 
-    <div class="sidebar-footer">
-      <button class="theme-switch" id="themeToggle">
-        <span class="ts-icon">🌙</span>
-        <span class="ts-label">Dark mode</span>
-        <span class="ts-track"><span class="ts-thumb"></span></span>
-      </button>
-      <p class="sidebar-note">Stored locally on this device.<br>Nothing leaves your browser.</p>
-    </div>
-  </aside>
+/* ---------- views ---------- */
+function funnel(recs) {
+  const f = { total: recs.length, approved: 0, invited: 0, booked: 0, attended: 0, completed: 0 };
+  recs.forEach(r => {
+    const st = recStatus(r), o = S.outreach[r.id] || {};
+    if (st === 'approved' || st === 'completed') f.approved++;
+    if (o.invitedAt) f.invited++; if (o.bookedAt) f.booked++; if (o.attendedAt) f.attended++; if (o.completedAt) f.completed++;
+  });
+  return f;
+}
+const bars = (items, max) => items.map(i => '<div class="bar"><div class="lab">' + esc(i[0]) + '</div><div class="track"><div class="fill" style="width:' + (max ? Math.max(i[1] ? 2 : 0, Math.round(100 * i[1] / max)) : 0) + '%"></div></div><div class="val">' + i[1] + '</div></div>').join('');
 
-  <!-- Main -->
-  <main class="main" id="main">
-
-    <!-- DASHBOARD -->
-    <section class="view" id="view-dashboard">
-      <div class="view-head">
-        <div>
-          <p class="eyebrow">Ledger — Overview</p>
-          <h1>Welcome back to the vault.</h1>
-          <p class="subhead">Here's the state of everything you've set out to learn.</p>
-        </div>
-        <button class="btn btn-primary" id="dashAddTopic">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-          New Topic
-        </button>
-      </div>
-
-      <div class="stat-grid" id="statGrid"></div>
-
-      <div class="dash-columns">
-        <div class="panel">
-          <div class="panel-head">
-            <h2>Recently added</h2>
-            <a href="#topics" class="panel-link">View all topics →</a>
-          </div>
-          <div id="recentTopics" class="recent-list"></div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">
-            <h2>Progress by status</h2>
-          </div>
-          <div id="progressBreakdown" class="progress-breakdown"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TOPICS -->
-    <section class="view" id="view-topics">
-      <div class="view-head">
-        <div>
-          <p class="eyebrow">The Catalog</p>
-          <h1>All topics.</h1>
-          <p class="subhead">Every subject you've filed away, in one drawer.</p>
-        </div>
-        <button class="btn btn-primary" id="topicsAddTopic">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-          New Topic
-        </button>
-      </div>
-
-      <div class="toolbar">
-        <div class="search-field">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          <input type="text" id="topicSearch" placeholder="Search by title or category…" autocomplete="off">
-        </div>
-        <select id="filterStatus" class="select">
-          <option value="all">All statuses</option>
-          <option value="Not Started">Not Started</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-        <select id="filterPriority" class="select">
-          <option value="all">All priorities</option>
-          <option value="High">High priority</option>
-          <option value="Medium">Medium priority</option>
-          <option value="Low">Low priority</option>
-        </select>
-      </div>
-
-      <div id="topicsGrid" class="topics-grid"></div>
-      <div id="topicsEmpty" class="empty-state hidden"></div>
-    </section>
-
-    <!-- TOPIC DETAIL -->
-    <section class="view" id="view-detail">
-      <button class="back-link" id="backToTopics">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Back to Topics
-      </button>
-
-      <div class="detail-head" id="detailHead"></div>
-
-      <div class="tabs">
-        <button class="tab active" data-tab="resources">Resources</button>
-        <button class="tab" data-tab="notes">Notes</button>
-      </div>
-
-      <div class="tab-panel" id="tab-resources">
-        <div class="tab-toolbar">
-          <p class="tab-hint">Everything you've stashed for this topic.</p>
-          <button class="btn btn-primary btn-sm" id="addResourceBtn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-            Add Resource
-          </button>
-        </div>
-        <div id="resourcesList" class="resources-list"></div>
-        <div id="resourcesEmpty" class="empty-state hidden"></div>
-      </div>
-
-      <div class="tab-panel hidden" id="tab-notes">
-        <div class="notes-wrap">
-          <textarea id="notesArea" placeholder="Jot down key concepts, formulas, questions, anything worth remembering…"></textarea>
-          <div class="notes-status" id="notesStatus">All notes saved locally.</div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-</div>
-
-<!-- TOPIC MODAL -->
-<div class="modal-overlay hidden" id="topicModalOverlay">
-  <div class="modal" role="dialog" aria-modal="true">
-    <div class="modal-head">
-      <h3 id="topicModalTitle">New Topic</h3>
-      <button class="icon-btn" id="closeTopicModal">✕</button>
-    </div>
-    <form id="topicForm" class="modal-body">
-      <label class="field">
-        <span>Title</span>
-        <input type="text" id="fTitle" placeholder="e.g. Remote Sensing" required>
-      </label>
-      <label class="field">
-        <span>Description</span>
-        <textarea id="fDescription" rows="3" placeholder="What is this topic about?"></textarea>
-      </label>
-      <div class="field-row">
-        <label class="field">
-          <span>Category</span>
-          <input type="text" id="fCategory" placeholder="e.g. Geospatial, ML, DSA" required>
-        </label>
-        <label class="field">
-          <span>Priority</span>
-          <select id="fPriority">
-            <option>High</option>
-            <option selected>Medium</option>
-            <option>Low</option>
-          </select>
-        </label>
-      </div>
-      <label class="field">
-        <span>Status</span>
-        <select id="fStatus">
-          <option>Not Started</option>
-          <option>In Progress</option>
-          <option>Completed</option>
-        </select>
-      </label>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" id="cancelTopicModal">Cancel</button>
-        <button type="submit" class="btn btn-primary" id="saveTopicBtn">Save Topic</button>
-      </div>
-    </form>
+function viewOverview() {
+  const ppl = PEOPLE.filter(p => F.area === 'all' || p.area === F.area);
+  const recs = []; ppl.forEach(p => p.recs.forEach(r => recs.push(r)));
+  const cnt = { pending_review: 0, approved: 0, deferred: 0, rejected: 0, closed: 0, completed: 0 };
+  recs.forEach(r => { cnt[recStatus(r)]++; });
+  const careP = new Set(), infoP = new Set(); let overdue = 0, due = 0;
+  recs.forEach(r => {
+    if (!isOpen(r)) return;
+    if (r.kind === 'service') { careP.add(r.pid); if (r.priority === 'contact_now') overdue++; else due++; } else infoP.add(r.pid);
+  });
+  const pri = { contact_now: 0, review_data_first: 0, routine: 0 };
+  recs.forEach(r => { if (isOpen(r)) pri[r.priority]++; });
+  const f = funnel(recs);
+  const dqTotal = ppl.reduce((n, p) => n + p.dq.length, 0);
+  return `<h1>Overview</h1>
+  <p class="sub">One population, three kinds of finding that are never blended into a single score. Everything below updates as you work the workflow.</p>
+  <div class="filters"><label>Area <select data-filter="area"><option value="all">All areas</option>${AREAS.map(a => '<option' + (F.area === a ? ' selected' : '') + '>' + a + '</option>').join('')}</select></label>
+  <span class="muted small">Evaluation date of the stored findings: ${esc(D.meta.evaluated_on)}</span></div>
+  <div class="kpis">
+    <div class="kpi"><b>${ppl.length}</b><span>People in view</span></div>
+    <div class="kpi"><b>${careP.size}</b><span>People with an open care gap</span></div>
+    <div class="kpi"><b>${infoP.size}</b><span>People with an information gap to resolve</span></div>
+    <div class="kpi"><b>${cnt.pending_review + cnt.deferred}</b><span>Recommendations awaiting review</span></div>
+    <div class="kpi"><b>${f.completed}</b><span>Services completed (simulated)</span></div>
   </div>
-</div>
-
-<!-- RESOURCE MODAL -->
-<div class="modal-overlay hidden" id="resourceModalOverlay">
-  <div class="modal" role="dialog" aria-modal="true">
-    <div class="modal-head">
-      <h3 id="resourceModalTitle">Add Resource</h3>
-      <button class="icon-btn" id="closeResourceModal">✕</button>
-    </div>
-    <form id="resourceForm" class="modal-body">
-      <label class="field">
-        <span>Resource Title</span>
-        <input type="text" id="rTitle" placeholder="e.g. NPTEL Remote Sensing Playlist" required>
-      </label>
-      <div class="field-row">
-        <label class="field">
-          <span>Type</span>
-          <select id="rType">
-            <option>YouTube</option>
-            <option>Book</option>
-            <option>Research Paper</option>
-            <option>Website</option>
-            <option>GitHub</option>
-            <option>Notes</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>URL</span>
-          <input type="url" id="rUrl" placeholder="https://…">
-        </label>
-      </div>
-      <label class="field">
-        <span>Short Description</span>
-        <textarea id="rDescription" rows="2" placeholder="What will you find here?"></textarea>
-      </label>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" id="cancelResourceModal">Cancel</button>
-        <button type="submit" class="btn btn-primary" id="saveResourceBtn">Save Resource</button>
-      </div>
-    </form>
+  <div class="grid g3">
+    <div class="card"><h2>1. Health risk ${chip('Not assessed', 'slate')}</h2>
+      <p>No validated risk model is active, so HETUVIA labels nobody &ldquo;elevated&rdquo; or &ldquo;not elevated&rdquo;. ${ppl.length} of ${ppl.length} people are shown as <b>not assessed</b>.</p>
+      <p class="muted small">A model trained on fictional labels would only measure the generator, not health. See About &amp; safeguards.</p></div>
+    <div class="card"><h2>2. Care gaps ${chip(careP.size + ' people', 'amber')}</h2>
+      <p>A service looks overdue or due under a configured rule: <b>${overdue}</b> overdue, <b>${due}</b> due.</p>
+      <p class="muted small">Rules are demonstration placeholders, not an Abu Dhabi guideline.</p></div>
+    <div class="card"><h2>3. Information gaps ${chip(infoP.size + ' people', 'violet')}</h2>
+      <p>Records too incomplete to judge, for example a missing date of birth or an unknown family history. Missing is never treated as &ldquo;no&rdquo;. ${dqTotal} data-quality findings in total.</p></div>
   </div>
-</div>
-
-<!-- CONFIRM MODAL -->
-<div class="modal-overlay hidden" id="confirmModalOverlay">
-  <div class="modal modal-sm" role="dialog" aria-modal="true">
-    <div class="modal-body confirm-body">
-      <div class="confirm-icon">!</div>
-      <h3 id="confirmTitle">Delete this item?</h3>
-      <p id="confirmMessage">This action can't be undone.</p>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" id="confirmCancel">Cancel</button>
-        <button type="button" class="btn btn-danger" id="confirmOk">Delete</button>
-      </div>
-    </div>
+  <div class="grid g2">
+    <div class="card"><h2>Open recommendations by outreach priority</h2>
+      ${bars([['Contact now', pri.contact_now], ['Review data first', pri.review_data_first], ['Routine', pri.routine]], Math.max(1, pri.contact_now, pri.review_data_first, pri.routine))}
+      <p class="muted small">Priority is the order for coordination, not clinical urgency.</p></div>
+    <div class="card"><h2>From recommendation to completed care</h2>
+      ${bars([['Recommended', f.total], ['Approved by a reviewer', f.approved], ['Invited (simulated)', f.invited], ['Booked', f.booked], ['Attended', f.attended], ['Completed', f.completed]], Math.max(1, f.total))}</div>
   </div>
-</div>
+  <div class="card"><h2>Try the workflow</h2>
+    <p>Open the <a href="#/review">Recommendation review</a> screen to approve a proposal, then <a href="#/outreach">Outreach &amp; appointments</a> to invite, book, mark attendance and complete. Numbers on this page change as you go. For a quick populated demo:</p>
+    <button class="btn ghost" data-act="scenario">Load scripted demo scenario</button>
+    <button class="btn ghost" data-act="reset" ${can('reset') ? '' : 'disabled'}>Reset demo</button>
+    <span class="muted small"> The scenario is clearly labelled &ldquo;Demo script&rdquo; in the audit log.</span></div>`;
+}
 
-<!-- TOASTS -->
-<div class="toast-stack" id="toastStack"></div>
+function queueRows() {
+  const rows = [];
+  PEOPLE.forEach(p => {
+    if (!p.recs.length) return;
+    if (F.area !== 'all' && p.area !== F.area) return;
+    if (F.q && p.id.toLowerCase().indexOf(F.q.toLowerCase()) < 0) return;
+    const recs = p.recs.filter(r => (F.priority === 'all' || r.priority === F.priority) && (F.kind === 'all' || r.kind === F.kind) && (F.status === 'all' || recStatus(r) === F.status));
+    if (!recs.length) return;
+    const open = recs.filter(isOpen);
+    const cat = open.length ? topPriority(open) : null;
+    rows.push({ p: p, recs: recs, cat: cat, rank: cat ? PRIORITY[cat].rank : 9 });
+  });
+  rows.sort((a, b) => a.rank - b.rank || (a.p.id < b.p.id ? -1 : 1));
+  return rows;
+}
+function drawQueue() {
+  const box = document.getElementById('qtable'); if (!box) return;
+  const rows = queueRows(), pages = Math.max(1, Math.ceil(rows.length / PAGE));
+  if (F.page >= pages) F.page = pages - 1;
+  const slice = rows.slice(F.page * PAGE, F.page * PAGE + PAGE);
+  box.innerHTML = rows.length ? `<table><thead><tr><th>Person</th><th>Age</th><th>Area</th><th>Queue category</th><th>Recommendations</th></tr></thead><tbody>${slice.map(r =>
+    `<tr class="clickable" data-act="open-person" data-id="${esc(r.p.id)}"><td><b>${esc(r.p.id)}</b></td><td>${r.p.age == null ? chip('Unknown', 'violet') : r.p.age}</td><td>${esc(r.p.area)}</td>
+    <td>${r.cat ? chip(PRIORITY[r.cat].label, PRIORITY[r.cat].cls) : chip('No open item', 'slate')}</td>
+    <td>${r.recs.map(x => chip(short(x.pathway_title) + ' \u00b7 ' + STATUS[recStatus(x)].label, STATUS[recStatus(x)].cls)).join(' ')}</td></tr>`).join('')}</tbody></table>
+    <div class="pager"><button class="btn ghost sm" data-act="page" data-page="${F.page - 1}" ${F.page === 0 ? 'disabled' : ''}>Previous</button><span class="muted small">Page ${F.page + 1} of ${pages} &middot; ${rows.length} people</span><button class="btn ghost sm" data-act="page" data-page="${F.page + 1}" ${F.page >= pages - 1 ? 'disabled' : ''}>Next</button></div>`
+    : '<div class="empty">No people match these filters.</div>';
+}
+function viewQueue() {
+  const opt = (key, items) => items.map(i => `<option value="${i[0]}"${F[key] === i[0] ? ' selected' : ''}>${esc(i[1])}</option>`).join('');
+  return `<h1>Work queue</h1><p class="sub">People grouped by the reason they need attention. ${PEOPLE.filter(p => p.recs.length).length} of ${PEOPLE.length} people have at least one recommendation; the rest are up to date or not eligible.</p>
+  <div class="card"><div class="filters">
+    <input type="text" placeholder="Search person ID" value="${esc(F.q)}" data-filter="q" aria-label="Search person ID">
+    <select data-filter="priority">${opt('priority', [['all', 'Any priority'], ['contact_now', 'Contact now'], ['review_data_first', 'Review data first'], ['routine', 'Routine']])}</select>
+    <select data-filter="kind">${opt('kind', [['all', 'Any reason'], ['service', 'Care gap'], ['information', 'Information gap']])}</select>
+    <select data-filter="status">${opt('status', [['all', 'Any status'], ['pending_review', 'Pending review'], ['approved', 'Approved'], ['deferred', 'Deferred'], ['rejected', 'Rejected'], ['completed', 'Completed']])}</select>
+    <select data-filter="area"><option value="all">All areas</option>${AREAS.map(a => '<option' + (F.area === a ? ' selected' : '') + '>' + a + '</option>').join('')}</select>
+  </div><div id="qtable"></div></div>`;
+}
 
-<script src="script.js"></script>
+function gapBlock(g) {
+  const e = g.evidence || {};
+  const col = g.outcome === 'overdue' ? 'amber' : g.outcome === 'due' ? 'blue' : g.outcome === 'not_assessable' ? 'violet' : 'slate';
+  return `<div class="note ${g.outcome === 'not_assessable' ? 'viol' : 'warn'}"><b>${esc(g.rule_id)} v${esc(g.rule_version)}</b> ${chip(nice(g.outcome), col)}<br>${esc(g.message)}
+  ${kv([['Age at evaluation', g.age == null ? 'unknown' : g.age], ['Last completed', g.last || 'never recorded'], ['Next due', g.due || 'not computed'], ['Completed without a date', e.undated_completed_count == null ? 0 : e.undated_completed_count], ['Why not assessed', e.reason || null], ['Rule status', e.rule_status || 'demonstration']])}
+  <div class="muted small">${esc(e.rule_source || '')}</div></div>`;
+}
+function viewPerson(id) {
+  const p = BY_ID[id];
+  if (!p) return '<div class="card"><h2>Person not found</h2><a href="#/queue">Back to the work queue</a></div>';
+  const dqBy = {}; p.dq.forEach(d => { (dqBy[d.subject_id] = dqBy[d.subject_id] || []).push(d); });
+  const careGaps = p.gaps.filter(g => g.outcome === 'overdue' || g.outcome === 'due');
+  const infoGaps = p.gaps.filter(g => g.outcome === 'not_assessable');
+  const ev = [];
+  p.encounters.forEach(e => ev.push({ d: e.date, k: 'Encounter', t: nice(e.type) + ' \u2014 ' + nice(e.status), miss: false, f: dqBy[e.id] || [] }));
+  p.observations.forEach(o => ev.push({ d: o.date, k: 'Measurement', t: (OBS_LABEL[o.type] || nice(o.type)) + ': ' + (o.state === 'present' ? o.value + ' ' + o.unit : stateText(o.state)), miss: o.state !== 'present', f: dqBy[o.id] || [] }));
+  p.screenings.forEach(s => ev.push({ d: s.completed || s.due || '', k: 'Screening', t: nice(s.type) + ' \u2014 ' + nice(s.status) + (s.completed ? ' on ' + s.completed : s.status === 'completed' ? ' (completion date missing)' : s.due ? ' (due ' + s.due + ')' : ' (no due date)'), miss: (s.status === 'completed' && !s.completed) || !s.due, f: dqBy[s.id] || [] }));
+  ev.sort((a, b) => (b.d || '').localeCompare(a.d || ''));
+  const hist = S.audit.filter(a => a.pid === p.id).slice().reverse();
+  return `<p><a href="#/queue">&larr; Work queue</a></p>
+  <h1>Person ${esc(p.id)}</h1>
+  <p class="sub">${p.age == null ? chip('Age unknown', 'violet') : 'Age ' + p.age} &middot; ${esc(p.sex || 'sex not recorded')} &middot; area ${esc(p.area)} &middot; language ${p.language ? esc(p.language) : chip('unknown', 'violet')} &middot; status ${esc(p.status)}</p>
+  <div class="grid g3">
+    <div class="card"><h2>Health risk ${chip('Not assessed', 'slate')}</h2><p class="small">No validated risk model is active. HETUVIA never labels a person &ldquo;elevated&rdquo; without one.</p></div>
+    <div class="card"><h2>Care gap ${careGaps.length ? chip(careGaps.length + ' open', 'amber') : chip('None stored', 'green')}</h2>
+      ${careGaps.length ? careGaps.map(gapBlock).join('') : '<p class="small">For every rule in effect this person is up to date or not eligible.</p>'}</div>
+    <div class="card"><h2>Information gap ${(infoGaps.length || p.dq.length) ? chip((infoGaps.length + p.dq.length) + ' findings', 'violet') : chip('None', 'green')}</h2>
+      ${infoGaps.map(gapBlock).join('')}
+      ${p.dq.length ? '<table><tbody>' + p.dq.map(d => `<tr><td>${chip(d.rule, d.severity === 'error' ? 'red' : d.severity === 'warning' ? 'amber' : 'slate')}</td><td><b>${esc(nice(d.field))}</b>: ${esc(d.state ? stateText(d.state) : 'conflict')}<div class="muted small">${esc(d.message)}</div></td></tr>`).join('') + '</tbody></table>' : '<p class="small">No data-quality findings.</p>'}</div>
+  </div>
+  <div class="card"><h2>Proposed next steps</h2>${p.recs.length ? p.recs.map(r => {
+    const st = recStatus(r), stg = stageOf(r);
+    return `<div class="note ${r.kind === 'information' ? 'viol' : 'warn'}"><b>${esc(short(r.pathway_title))}</b> ${chip(PRIORITY[r.priority].label, PRIORITY[r.priority].cls)} ${chip(STATUS[st].label, STATUS[st].cls)} ${st === 'approved' || st === 'completed' ? chip('Outreach: ' + STAGE_LABEL[stg], 'teal') : ''}
+    <ul>${r.reasons.map(x => '<li>' + esc(x) + '</li>').join('')}</ul>
+    <div class="small muted">${esc(r.uncertainty)}</div>
+    <p><button class="btn ghost sm" data-act="goto-review" data-rec="${r.id}">${st === 'pending_review' || st === 'deferred' ? 'Review this recommendation' : 'View in review'}</button>
+    ${st === 'approved' || st === 'completed' ? `<button class="btn ghost sm" data-act="goto-outreach" data-rec="${r.id}">Open outreach</button>` : ''}</p></div>`;
+  }).join('') : '<p class="muted">Nothing to recommend: no stored care gap or blocking information gap.</p>'}</div>
+  <div class="grid g2">
+    <div class="card"><h2>Profile fields</h2>${kv([['Date of birth', p.dob ? p.dob : stateText('unknown')], ['Preferred language', p.language ? p.language : stateText('unknown')], ['Area', p.area], ['Family history', stateText(p.family_history)], ['Encounters on file', p.encounters.length]])}
+      <h3>Recorded conditions and family history</h3>${p.conditions.length ? '<table><tbody>' + p.conditions.map(c => `<tr><td>${chip(c.context === 'family_history' ? 'Family' : 'Personal', 'slate')}</td><td>${esc(c.label)} <span class="muted small">(${esc(c.code)})</span></td></tr>`).join('') + '</tbody></table><p class="muted small">Condition codes are demonstration placeholders.</p>' : '<p class="muted small">No conditions recorded. For family history, &ldquo;nothing recorded&rdquo; is shown as the stored state above, never as &ldquo;none&rdquo;.</p>'}</div>
+    <div class="card"><h2>Review and outreach history</h2>${hist.length ? '<table><tbody>' + hist.map(a => `<tr><td class="small">${esc(a.t.slice(0, 16).replace('T', ' '))}</td><td><b>${esc(nice(a.action))}</b><div class="muted small">${esc(a.actor)} (${esc(a.role)}) ${esc(a.detail)}</div></td></tr>`).join('') + '</tbody></table>' : '<p class="muted small">No actions recorded for this person yet.</p>'}</div>
+  </div>
+  <div class="card"><h2>Timeline</h2><p class="muted small">Purple dots mark missing or unreliable information. Provenance in the full system: every row carries its source system, record ID and import time.</p>
+    <div class="tl">${ev.length ? ev.map(e => `<div class="ev${e.miss || e.f.length ? ' miss' : ''}"><div class="d">${esc(e.d || 'undated')} &middot; ${esc(e.k)}</div><div>${esc(e.t)} ${e.f.map(x => chip(x.rule, 'violet')).join(' ')}</div></div>`).join('') : '<div class="empty">No events on file.</div>'}</div></div>`;
+}
+
+function evidenceHtml(r) {
+  const e = r.evidence || {};
+  if (r.kind === 'service') return kv([['Rule', r.rule_id + ' v' + r.rule_version], ['Outcome', nice(e.outcome)], ['Age at evaluation', e.age_years], ['Last completed', e.last_completed_on || 'never recorded'], ['Next due', e.due_date], ['Finding', e.message]]);
+  const care = (e.care_gap_findings || []).map(c => '<li><b>' + esc(c.rule_id) + '</b>: ' + esc(c.message) + '</li>').join('');
+  const dq = (e.data_quality_findings || []).map(d => '<li><b>' + esc(d.rule_code) + ' ' + esc(nice(d.field_name)) + '</b> (' + esc(d.field_state ? stateText(d.field_state) : 'conflict') + '): ' + esc(d.message) + '</li>').join('');
+  return '<ul>' + care + dq + '</ul>';
+}
+function viewReview() {
+  const all = RECS.filter(r => { const s = recStatus(r); return s === 'pending_review' || s === 'deferred'; });
+  const list = all.filter(r => F.rpriority === 'all' || r.priority === F.rpriority)
+    .sort((a, b) => PRIORITY[a.priority].rank - PRIORITY[b.priority].rank || (a.pid < b.pid ? -1 : 1));
+  let sel = F.reviewSel && REC[F.reviewSel] ? REC[F.reviewSel] : null;
+  if (!sel || (F.reviewSel && list.indexOf(sel) < 0 && recStatus(sel) !== 'pending_review' && recStatus(sel) !== 'deferred' && false)) sel = list[0] || null;
+  if (sel) F.reviewSel = sel.id;
+  const tab = (k, l) => `<button class="btn ${F.rpriority === k ? '' : 'ghost'} sm" data-act="rtab" data-k="${k}">${l}</button>`;
+  const left = `<div class="card"><div class="filters">${tab('all', 'All (' + all.length + ')')}${tab('contact_now', 'Contact now')}${tab('review_data_first', 'Data first')}${tab('routine', 'Routine')}</div>
+    <div class="list">${list.slice(0, 60).map(r => `<div class="item${sel && sel.id === r.id ? ' sel' : ''}" data-act="select-review" data-rec="${r.id}"><b>${esc(r.pid)}</b> ${chip(PRIORITY[r.priority].label, PRIORITY[r.priority].cls)}<small>${esc(short(r.pathway_title))}${recStatus(r) === 'deferred' ? ' \u00b7 deferred' : ''}</small></div>`).join('') || '<div class="empty">Nothing is waiting for review.</div>'}${list.length > 60 ? '<div class="empty small">Showing 60 of ' + list.length + '</div>' : ''}</div></div>`;
+  let right;
+  if (!sel) right = '<div class="card empty">All recommendations have been reviewed. Open <a href="#/outreach">Outreach &amp; appointments</a> to act on the approved ones.</div>';
+  else {
+    const dis = can('review') ? '' : 'disabled';
+    const past = S.audit.filter(a => a.rec === sel.id).reverse();
+    right = `<div class="card"><h2>${esc(short(sel.pathway_title))}</h2>
+      <p>Person <a href="#/person/${esc(sel.pid)}"><b>${esc(sel.pid)}</b></a> ${chip(PRIORITY[sel.priority].label, PRIORITY[sel.priority].cls)} ${chip(STATUS[recStatus(sel)].label, STATUS[recStatus(sel)].cls)}</p>
+      <h3>Why this person is proposed</h3><ul>${sel.reasons.map(x => '<li>' + esc(x) + '</li>').join('')}</ul>
+      <h3>Triggering facts and rule</h3>${evidenceHtml(sel)}
+      <div class="note viol"><b>Uncertainty.</b> ${esc(sel.uncertainty)}</div>
+      <div class="note"><b>Why a human must review.</b> ${esc(sel.review_required)}</div>
+      <h3>Your decision</h3>
+      ${can('review') ? '' : '<div class="note warn">The current role (' + esc(ROLES[S.role].label) + ') cannot review. Switch &ldquo;Viewing as&rdquo; to Clinical reviewer or Guest.</div>'}
+      <textarea id="note" placeholder="Reviewer note (required to defer or reject)" ${dis}></textarea>
+      <p><button class="btn" data-act="decide" data-d="approve" ${dis}>Approve</button> <button class="btn warn" data-act="decide" data-d="defer" ${dis}>Defer</button> <button class="btn danger" data-act="decide" data-d="reject" ${dis}>Reject</button></p>
+      ${past.length ? '<h3>Earlier decisions</h3>' + past.map(a => '<div class="small">' + esc(a.t.slice(0, 16).replace('T', ' ')) + ' &middot; ' + esc(nice(a.action)) + ' by ' + esc(a.actor) + ' ' + esc(a.detail) + '</div>').join('') : ''}</div>`;
+  }
+  return `<h1>Recommendation review</h1><p class="sub">Every proposal needs a human decision. Approve, defer or reject, with a note. Nothing reaches outreach until it is approved, and every decision is written to the audit log.</p><div class="split">${left}${right}</div>`;
+}
+
+function messageText(r, p) {
+  const what = r.kind === 'service' ? 'your ' + short(r.pathway_title).toLowerCase() : 'a quick check of the details we hold for you (such as date of birth or family history)';
+  return 'Hello, this is the HETUVIA demonstration health team.\nOur records suggest you may be due for ' + what + '. If you would like to arrange it, please reply or call the clinic and we will find a time that suits you.\nYou are free to decline, or to ask us not to contact you again.\nReference: ' + p.id + '\n[DEMO: nothing is sent]';
+}
+function viewOutreach() {
+  const list = RECS.filter(r => recStatus(r) === 'approved').sort((a, b) => a.pid < b.pid ? -1 : 1);
+  const doneCount = RECS.filter(r => recStatus(r) === 'completed').length;
+  let sel = F.outSel && REC[F.outSel] && recStatus(REC[F.outSel]) !== 'pending_review' ? REC[F.outSel] : null;
+  if (!sel) sel = list[0] || null;
+  if (sel) F.outSel = sel.id;
+  const left = `<div class="card"><h2>Approved (${list.length})</h2><div class="list">${list.slice(0, 80).map(r => `<div class="item${sel && sel.id === r.id ? ' sel' : ''}" data-act="select-outreach" data-rec="${r.id}"><b>${esc(r.pid)}</b> ${chip(STAGE_LABEL[stageOf(r)], 'teal')}<small>${esc(short(r.pathway_title))}</small></div>`).join('') || '<div class="empty">Approve something in Recommendation review first.</div>'}</div><p class="muted small">${doneCount} completed so far (closed).</p></div>`;
+  let right;
+  if (!sel) right = '<div class="card empty">Nothing approved yet.</div>';
+  else {
+    const p = BY_ID[sel.pid], st = stageOf(sel), o = S.outreach[sel.id] || {}, dis = can('outreach') ? '' : 'disabled';
+    const steps = ['not_started', 'invited', 'booked', 'attended', 'completed'];
+    const cur = st === 'missed' ? 1 : steps.indexOf(st);
+    const stepper = '<div class="steps">' + steps.map((s, i) => `<span class="step ${i < cur ? 'done' : i === cur ? 'now' : ''}">${STAGE_LABEL[s]}</span>`).join('') + (st === 'missed' ? '<span class="step now">Recall: rebook</span>' : '') + '</div>';
+    const langWarn = !p.language ? '<div class="note viol">Preferred language is not recorded. In a real deployment the message would be held until it is.</div>' : (p.language !== 'en' ? '<div class="note warn">Preferred language: ' + esc(p.language) + '. Only an English demonstration template exists; a real service would send an approved translation.</div>' : '');
+    let action = '';
+    if (st === 'not_started') {
+      action = `${langWarn}<h3>Message preview</h3><div class="msg">${esc(messageText(sel, p))}</div>
+      <label class="inline"><input type="checkbox" id="consent" ${dis}> <span>I checked this person's consent and contact preference. (This dataset holds neither, so the check is recorded by a human.)</span></label>
+      <p><select id="channel" ${dis}><option>SMS</option><option>Phone call</option><option>Patient portal</option></select> <button class="btn" data-act="invite" ${dis}>Simulate invitation</button></p>`;
+    } else if (st === 'invited' || st === 'missed') {
+      const slots = makeSlots();
+      action = `<h3>${st === 'missed' ? 'Recall: choose a new slot' : 'Choose an appointment slot (simulated)'}</h3><p>${slots.map((s, i) => `<label class="slot"><input type="radio" name="slot" value="${s.value}" ${i === 0 ? 'checked' : ''} ${dis}>${esc(s.label)}</label>`).join('')}</p><button class="btn" data-act="book" ${dis}>Book appointment</button>`;
+    } else if (st === 'booked') {
+      action = `<h3>Appointment</h3><p>${esc(o.booking.slot)} (simulated)</p><button class="btn" data-act="attend" data-r="attended" ${dis}>Mark attended</button> <button class="btn warn" data-act="attend" data-r="missed" ${dis}>Mark missed (start recall)</button>`;
+    } else if (st === 'attended') {
+      action = `<h3>Service delivered</h3><p>Record the completed service. This closes the gap and updates every dashboard.</p><button class="btn" data-act="complete" ${dis}>Record service as completed</button>`;
+    } else {
+      action = '<div class="note">Completed. The care gap is closed and this person leaves the open work queue.</div>';
+    }
+    right = `<div class="card"><h2>${esc(short(sel.pathway_title))}</h2><p>Person <a href="#/person/${esc(p.id)}"><b>${esc(p.id)}</b></a> &middot; reviewer ${esc((S.decisions[sel.id] || {}).reviewer || 'n/a')}</p>
+      ${can('outreach') ? '' : '<div class="note warn">The current role (' + esc(ROLES[S.role].label) + ') cannot act on outreach. Switch &ldquo;Viewing as&rdquo; to Outreach coordinator or Guest.</div>'}
+      ${stepper}${action}
+      ${(o.events && o.events.length) ? '<h3>Event history</h3>' + o.events.map(e => '<div class="small">' + esc(e.t.slice(0, 16).replace('T', ' ')) + ' &middot; <b>' + esc(e.type) + '</b> ' + esc(e.detail) + '</div>').join('') : ''}</div>`;
+  }
+  return `<h1>Outreach &amp; appointments</h1><p class="sub">Only approved recommendations appear here. Invitations, bookings and attendance are simulated: no message is ever sent.</p><div class="split">${left}${right}</div>`;
+}
+
+function groupStats(ppl) {
+  const g = { n: ppl.length, care: 0, info: 0, approved: 0, invited: 0, completed: 0 };
+  ppl.forEach(p => {
+    if (p.recs.some(r => r.kind === 'service')) g.care++;
+    if (p.recs.some(r => r.kind === 'information')) g.info++;
+    p.recs.forEach(r => { const s = recStatus(r), o = S.outreach[r.id] || {}; if (s === 'approved' || s === 'completed') g.approved++; if (o.invitedAt) g.invited++; if (o.completedAt) g.completed++; });
+  });
+  return g;
+}
+function viewInsights() {
+  const overall = groupStats(PEOPLE), ovCov = rateNum(overall.invited, overall.approved);
+  const mk = (title, items) => {
+    const rows = items.map(it => {
+      const g = groupStats(it.ppl), cov = rateNum(g.invited, g.approved);
+      const low = (cov != null && ovCov != null && cov < ovCov - 15) ? ' ' + chip('lower than overall', 'amber') : '';
+      return `<tr><td><b>${esc(it.label)}</b></td><td>${cell(g.n)}</td><td>${rate(g.care, g.n)}</td><td>${rate(g.info, g.n)}</td><td>${cell(g.approved)}</td><td>${cell(g.invited)}</td><td>${rate(g.invited, g.approved)}${low}</td><td>${cell(g.completed)}</td><td>${rate(g.completed, g.approved)}</td></tr>`;
+    }).join('');
+    return `<div class="card"><h2>${title}</h2><table><thead><tr><th>Group</th><th>People</th><th>Care-gap rate</th><th>Info-gap rate</th><th>Approved</th><th>Invited</th><th>Invitation coverage</th><th>Completed</th><th>Completion rate</th></tr></thead><tbody>${rows}
+      <tr><td><b>All people</b></td><td>${overall.n}</td><td>${rate(overall.care, overall.n)}</td><td>${rate(overall.info, overall.n)}</td><td>${overall.approved}</td><td>${overall.invited}</td><td>${rate(overall.invited, overall.approved)}</td><td>${overall.completed}</td><td>${rate(overall.completed, overall.approved)}</td></tr></tbody></table></div>`;
+  };
+  const ageGroup = p => p.age == null ? 'Age unknown' : p.age < 18 ? 'Children (0-17)' : 'Adults (18+)';
+  const groups = fn => { const m = {}; PEOPLE.forEach(p => { const k = fn(p); (m[k] = m[k] || []).push(p); }); return Object.keys(m).sort().map(k => ({ label: k, ppl: m[k] })); };
+  return `<h1>Community insights</h1><p class="sub">Aggregate reach and care gaps across groups, with privacy safeguards, and a check on whether outreach is reaching groups evenly.</p>
+  <div class="note"><b>Privacy rules applied.</b> Counts of 1 to ${MIN_CELL - 1} are hidden (&ldquo;&lt;${MIN_CELL}&rdquo;). Rates are shown only when the group has at least ${MIN_DENOM} people in the denominator and the count behind the rate is not itself hidden, so a rate can never reveal a suppressed count. Differences are descriptive and come from fictional data; they say nothing about real communities.</div>
+  ${mk('By area', groups(p => p.area))}${mk('By age group', groups(ageGroup))}${mk('By preferred language', groups(p => p.language || 'unknown'))}
+  <p class="muted small">Care-gap rate = people with a care-gap recommendation \u00f7 people in the group. Invitation coverage = invited \u00f7 approved. Completion rate = completed \u00f7 approved. All outreach figures are simulated.</p>`;
+}
+
+function viewAudit() {
+  const rows = S.audit.slice().reverse().slice(0, 300);
+  return `<h1>Audit log</h1><p class="sub">Who did what, and when. Append-only in the full system (PostgreSQL <code>audit_events</code>); this hosted demo keeps its log in your browser only.</p>
+  <div class="card">${rows.length ? '<table><thead><tr><th>Time (UTC)</th><th>Who</th><th>Action</th><th>Record</th><th>Detail</th></tr></thead><tbody>' + rows.map(a => `<tr><td class="small">${esc(a.t.slice(0, 19).replace('T', ' '))}</td><td>${esc(a.actor)}<div class="muted small">${esc(a.role)}</div></td><td>${esc(nice(a.action))}</td><td>${a.pid ? '<a href="#/person/' + esc(a.pid) + '">' + esc(a.pid) + '</a>' : '\u2014'}</td><td class="small">${esc(a.detail)}</td></tr>`).join('') + '</tbody></table>' : '<div class="empty">No actions yet. Approve a recommendation to see the first entry.</div>'}</div>`;
+}
+
+function viewAbout() {
+  return `<h1>About &amp; safeguards</h1><p class="sub">What this prototype is, what it is not, and the rules it will not break.</p>
+  <div class="grid g2">
+  <div class="card"><h2>What HETUVIA does</h2><p>It helps an authorised health team find people who may need preventive attention, shows exactly why, proposes a configured pathway, gets a human to decide, and tracks the follow-up to completion. It coordinates preventive care. It does not diagnose and it is not a monitor.</p>
+    <p>Three findings are kept apart on purpose: <b>health risk</b>, <b>care gap</b> and <b>information gap</b>. They need different next steps, so they are never added into one opaque score.</p></div>
+  <div class="card"><h2>Safeguards built in</h2><ul>
+    <li><b>Fictional data only.</b> ${PEOPLE.length} generated people; no real patient information anywhere.</li>
+    <li><b>Missing is never negative.</b> Unknown, not collected, stale and explicitly absent are separate states. A blank is never read as &ldquo;no&rdquo;.</li>
+    <li><b>Demonstration rules.</b> Eligibility ages and intervals are labelled placeholders, not an Abu Dhabi guideline. The rule loader refuses an &ldquo;approved&rdquo; rule without a confirmed source.</li>
+    <li><b>No unvalidated model.</b> Health risk reads &ldquo;Not assessed&rdquo;. No accuracy is claimed.</li>
+    <li><b>Human review</b> for every recommendation, with a note for defer or reject, and an audit trail.</li>
+    <li><b>Evidence on every finding:</b> rule, version, facts and time.</li>
+    <li><b>Small-cell suppression</b> and denominators on group statistics.</li>
+    <li><b>No real messages.</b> Invitations are simulated, behind a recorded consent check.</li></ul></div>
+  <div class="card"><h2>How it is built</h2><p>Python engines (data quality, care gaps, pathways) on PostgreSQL, tested by an automated suite of 125 tests, including a check that the data-quality engine finds every gap deliberately planted in the generated population. This page is a read-only export of the engines&rsquo; output for the generated population, with the workflow (review, outreach, attendance) simulated in your browser.</p>
+    <p class="muted small">Export: ${esc(D.meta.generated_at)} &middot; evaluation date ${esc(D.meta.evaluated_on)} &middot; rules ${esc(D.meta.rule_set)}.</p></div>
+  <div class="card"><h2>Rules in use (demonstration)</h2>${(D.rules || []).map(r => '<h3>' + esc(r.rule_id) + ' v' + esc(r.version) + '</h3>' + kv([['Service', r.title], ['Eligible ages', r.min_age + ' to ' + r.max_age], ['Interval', r.interval_days + ' days'], ['Due window', r.lead_days + ' days early, ' + r.grace_days + ' days grace'], ['Status', r.status]]) + '<div class="muted small">' + esc(r.source) + '</div>').join('')}</div>
+  </div>`;
+}
+
+/* ---------- routing and events ---------- */
+let lastRoute = '';
+function render() {
+  const h = (location.hash || '#/overview').replace(/^#\/?/, '');
+  const parts = h.split('/'), name = parts[0] || 'overview', arg = decodeURIComponent(parts.slice(1).join('/'));
+  document.getElementById('nav').innerHTML = NAV.map(n => `<a href="#/${n[0]}" class="${(name === n[0] || (name === 'person' && n[0] === 'queue')) ? 'on' : ''}">${n[1]}</a>`).join('');
+  const views = { overview: viewOverview, queue: viewQueue, person: () => viewPerson(arg), review: viewReview, outreach: viewOutreach, insights: viewInsights, audit: viewAudit, about: viewAbout };
+  app.innerHTML = (views[name] || viewOverview)();
+  if (name === 'queue') drawQueue();
+  if (h !== lastRoute) { window.scrollTo(0, 0); lastRoute = h; }
+}
+const go = hash => { if (location.hash === hash) render(); else location.hash = hash; };
+
+document.getElementById('role').innerHTML = Object.keys(ROLES).map(k => `<option value="${k}">${ROLES[k].label}</option>`).join('');
+document.getElementById('role').value = S.role;
+document.getElementById('role').addEventListener('change', e => { S.role = e.target.value; save(); render(); });
+window.addEventListener('hashchange', render);
+
+document.addEventListener('input', e => {
+  const k = e.target.getAttribute && e.target.getAttribute('data-filter');
+  if (k === 'q') { F.q = e.target.value; F.page = 0; drawQueue(); }
+});
+document.addEventListener('change', e => {
+  const k = e.target.getAttribute && e.target.getAttribute('data-filter');
+  if (!k || k === 'q') return;
+  F[k] = e.target.value; F.page = 0;
+  if ((location.hash || '').indexOf('#/queue') === 0) { drawQueue(); } else render();
+});
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t || t.disabled) return;
+  const act = t.getAttribute('data-act'), id = t.getAttribute('data-id'), rec = REC[t.getAttribute('data-rec')];
+  const w = whoNow(); let err = null, ok = null;
+  switch (act) {
+    case 'open-person': go('#/person/' + encodeURIComponent(id)); return;
+    case 'page': F.page = +t.getAttribute('data-page'); drawQueue(); return;
+    case 'goto-review': F.reviewSel = rec.id; go('#/review'); return;
+    case 'goto-outreach': F.outSel = rec.id; go('#/outreach'); return;
+    case 'select-review': F.reviewSel = rec.id; render(); return;
+    case 'select-outreach': F.outSel = rec.id; render(); return;
+    case 'rtab': F.rpriority = t.getAttribute('data-k'); F.reviewSel = null; render(); return;
+    case 'decide': {
+      const d = t.getAttribute('data-d'), r = REC[F.reviewSel];
+      if (!can('review')) { toast('This role cannot review.', true); return; }
+      err = doDecision(r, d, document.getElementById('note').value, w);
+      if (!err) { ok = 'Recorded: ' + d + ' for ' + r.pid + '. Written to the audit log.'; F.reviewSel = null; }
+      break;
+    }
+    case 'invite': {
+      if (!can('outreach')) { toast('This role cannot act on outreach.', true); return; }
+      const r = REC[F.outSel]; err = doInvite(r, document.getElementById('channel').value, document.getElementById('consent').checked, w);
+      if (!err) ok = 'Invitation simulated for ' + r.pid + '. Nothing was sent.'; break;
+    }
+    case 'book': {
+      if (!can('outreach')) { toast('This role cannot act on outreach.', true); return; }
+      const r = REC[F.outSel], pick = document.querySelector('input[name=slot]:checked');
+      err = doBook(r, pick ? pick.value : '', w); if (!err) ok = 'Appointment booked (simulated).'; break;
+    }
+    case 'attend': {
+      if (!can('outreach')) { toast('This role cannot act on outreach.', true); return; }
+      const r = REC[F.outSel], res = t.getAttribute('data-r');
+      err = doAttendance(r, res, w); if (!err) ok = res === 'attended' ? 'Marked attended.' : 'Marked missed. Recall started: choose a new slot.'; break;
+    }
+    case 'complete': {
+      if (!can('outreach')) { toast('This role cannot act on outreach.', true); return; }
+      const r = REC[F.outSel]; err = doComplete(r, w); if (!err) { ok = 'Service completed. The gap is closed and the dashboards have updated.'; F.outSel = null; } break;
+    }
+    case 'scenario': runScenario(); F.reviewSel = null; F.outSel = null; toast('Scripted demo scenario loaded (see the audit log: "Demo script").'); render(); return;
+    case 'reset': if (!can('reset')) { toast('This role cannot reset the demo.', true); return; } S = blank(); save(); F.reviewSel = null; F.outSel = null; toast('Demo reset.'); render(); return;
+    default: return;
+  }
+  if (err) toast(err, true); else { toast(ok); render(); }
+});
+render();
+})();
+</script>
 </body>
 </html>
