@@ -9,7 +9,7 @@
 | Date | 2026-11-20 |
 | Baseline commit | `5a6d9d7` — `demo: static HETUVIA demo page and export command` |
 | Repository | `https://github.com/kanishk-29/hetuvia.git` |
-| Scope | Backend engines, CLI workflows, persistence, static demo, health API and thin frontend |
+| Scope | Backend engines, CLI workflows, persistence, static demo, read-only operator API and console |
 | Supersedes | Empty placeholders `docs/product_scope.md`, `docs/api_contract.md`, `docs/rule_catalogue.md` |
 | Intended audience | Product owner, developers, testers, reviewers, demonstrators |
 
@@ -27,7 +27,7 @@ This SRS defines the functional and non-functional requirements of HETUVIA as im
 
 | Classification | Capabilities |
 |---|---|
-| **Implemented (M)** | Synthetic population generation; CSV import with validation and quarantine; 10 data-quality rules; versioned demonstration care-gap rules; care-gap judgement with evidence; recommendation generation and priority; human review with audit trail; static demo export and UI; health API; 125 automated tests |
+| **Implemented (M)** | Synthetic population generation; CSV import with validation and quarantine; 10 data-quality rules; versioned demonstration care-gap rules; care-gap judgement with evidence; recommendation generation and priority; human review with audit trail; static demo export and UI; read-only operator API and console; 136 automated tests |
 | **Planned (P)** | Backend outreach decision service referenced as “Chunk 10” in `docs/care_gap_rules.md`; real cited guideline source required before any rule can become `approved`; replacement of placeholder frontend with full application |
 | **Out of scope (O)** | Real patient data, EHR/FHIR integration, clinical risk scoring, automated outreach delivery, appointment booking against a real system, authentication/authorisation, unit conversion, person matching by name or demographics |
 
@@ -67,7 +67,7 @@ Priority legend used in Section 3: **M** = mandatory for the current prototype a
 HETUVIA is a backend-centred prototype with three presentation surfaces:
 
 1. **CLI workflows** are the primary operator interface. They load data, run engines, review recommendations and export the demo payload.
-2. **FastAPI service** currently exposes a single health endpoint used by the thin Next.js page.
+2. **FastAPI service** exposes read-only operator endpoints used by the Next.js console; clinical actions remain CLI-only until auth/RBAC exists.
 3. **Static demo** (`docs/demo/index.html`) reads `data.js` and renders work queues, person detail, simulated review/outreach, insights and an in-browser audit log. It requires no running backend.
 
 The engines are separated into pure functions (`dq_rules.py`, `care_gap_engine.py`, `recommendation_engine.py`) and persistence orchestrators (`dq_runner.py`, `care_gap_runner.py`, `recommendation_runner.py`). This keeps decisions deterministic and testable without a database.
@@ -210,15 +210,17 @@ The engines are separated into pure functions (`dq_rules.py`, `care_gap_engine.p
 
 - **FR-6.6 — M — Static hosting.** The demo shall run from local files or any static server; `docs/.nojekyll` supports GitHub Pages. The page shall display a visible demonstration/fictional-data label.
 
-### FR-7 API and thin frontend
+### FR-7 API and operator console
 
 - **FR-7.1 — M — FastAPI application.** The system shall expose a FastAPI app titled from `settings.app_name`, with CORS origins from configuration, allowed methods `GET` and `POST`, and all headers allowed.
 
-- **FR-7.2 — M — Health endpoint.** The system shall expose exactly one API route, `GET /api/v1/health`, returning `{"status":"ok","service":"hetuvia-api"}`.
+- **FR-7.2 — M — Health endpoint.** The system shall expose `GET /api/v1/health`, returning `{"status":"ok","service":"hetuvia-api"}`.
 
-- **FR-7.3 — M — Frontend health check.** The Next.js page shall call the health endpoint once on mount using `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`) and display `checking...`, `OK` or `unreachable`.
+- **FR-7.3 — M — Read-only operator API.** The system shall expose paginated read endpoints for summary, people, care-gap findings, data-quality findings, recommendations and audit events. Endpoints are filtered by `source_system`, `person_id` and other applicable fields.
 
-- **FR-7.4 — O — Clinical API.** No patient, finding, recommendation or review endpoints are provided in the baseline.
+- **FR-7.4 — M — Operator console.** The Next.js page shall consume the operator API using `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`), display API status, summary counts, work queue, people, findings and audit history, and keep the demonstration-only banner visible.
+
+- **FR-7.5 — O — Clinical action API.** No review, import, reset or other mutating endpoints are provided; those workflows remain CLI-only until authentication and authorisation exist.
 
 ### FR-8 Reporting and traceability
 
@@ -353,7 +355,7 @@ An `approved` recommendation is required before the demo presents outbound outre
 | NFR-1 | Determinism | Seeded generation and pure engines shall produce identical outputs for the same inputs, rule version and evaluation date. |
 | NFR-2 | Explainability | Every stored care-gap finding and recommendation shall contain machine-readable evidence; person reports shall show the human-readable message. |
 | NFR-3 | Safety | Missing data shall never be coerced; `not_assessable` shall remain distinct from care gaps; demonstration labels shall appear in rules, exports and the demo. |
-| NFR-4 | Testability | Maintain the 125-test baseline. Each new rule, validator or workflow shall add focused tests; pure rule logic shall be testable without a database. |
+| NFR-4 | Testability | Maintain the current test baseline. Each new rule, validator, workflow or API surface shall add focused tests; pure rule logic shall be testable without a database. |
 | NFR-5 | Performance | The 300-person seed, three-engine workflow and demo export shall complete interactively on a local PostgreSQL instance. The current full test suite completes in about 71 seconds. |
 | NFR-6 | Maintainability | Keep rule definitions in data, keep pure logic separate from persistence orchestration, and keep CLI entry points thin. |
 | NFR-7 | Privacy and security | Use only fictional data. No authentication, authorisation or PHI safeguards are implemented; do not deploy this baseline with real patient data. Development DB credentials and localhost-only CORS are intentional. |
@@ -387,6 +389,13 @@ All commands run from `backend/` with the virtual environment active.
 | Method | Path | Request | Response |
 |---|---|---|---|
 | GET | `/api/v1/health` | None | `200` with `{"status":"ok","service":"hetuvia-api"}` |
+| GET | `/api/v1/summary` | Optional `source` | `200` with aggregate counts and demo label |
+| GET | `/api/v1/people` | Optional `source`, `status`, `search`, `limit`, `offset` | `200` with `items` and `meta` |
+| GET | `/api/v1/people/{person_id}` | Person UUID | `200` with one person, or `404` |
+| GET | `/api/v1/care-gap-findings` | Optional `source`, `person_id`, `outcome`, `limit`, `offset` | `200` with `items` and `meta` |
+| GET | `/api/v1/data-quality-findings` | Optional `source`, `person_id`, `rule_code`, `limit`, `offset` | `200` with `items` and `meta` |
+| GET | `/api/v1/recommendations` | Optional `source`, `person_id`, `status`, `priority`, `limit`, `offset` | `200` with `items` and `meta` |
+| GET | `/api/v1/audit-events` | Optional `action`, `person_id`, `limit`, `offset` | `200` with `items` and `meta` |
 
 ### 7.3 CSV interface
 
@@ -429,7 +438,7 @@ window.HETUVIA_DATA = {
 ```powershell
 cd backend
 .\.venv\Scripts\python.exe -m pytest -q
-# 125 passed, 1 warning in ~71s
+# 136 passed, 1 warning in ~68s
 ```
 
 The warning is a Starlette deprecation notice about `httpx` with `starlette.testclient`; it does not affect results. Tests require the PostgreSQL service from `docker-compose.yml`.
@@ -465,12 +474,12 @@ The warning is a Starlette deprecation notice about `httpx` with `starlette.test
 2. No real patient data, consent record, contact preference or EHR integration exists. The demo asks a human to confirm consent as a scripted step.
 3. No authentication or authorisation; reviewer identity is a free-text name.
 4. No backend outreach decision, message delivery or real appointment booking. The demo simulates these in `localStorage`.
-5. Only one HTTP endpoint exists; there is no clinical API.
-6. The Next.js frontend is a health-status scaffold, not a user application.
+5. The HTTP API is read-only; there is no clinical action API.
+6. The Next.js frontend is a read-only operator console, not an authenticated user application.
 7. CSV units are validated but never converted; unknown units cause rejection.
 8. People are never merged by demographic similarity.
 9. The demo entry point is `docs/demo/index.html`; earlier revisions also contained an unrelated template and a duplicate demo filename.
-10. `docs/product_scope.md`, `docs/api_contract.md` and `docs/rule_catalogue.md` remain empty placeholders; this SRS is authoritative.
+10. `docs/product_scope.md` remains a placeholder; `docs/api_contract.md` documents the read-only HTTP interface and `docs/rule_catalogue.md` points to the maintained rule references. This SRS is authoritative for requirements.
 
 ---
 
@@ -483,7 +492,8 @@ The warning is a Starlette deprecation notice about `httpx` with `starlette.test
 | Done | Static demo and export command | Commit `5a6d9d7` |
 | Planned (P) | Chunk 10 outreach decision service | `docs/care_gap_rules.md` line 12 |
 | Planned (P) | Approved, cited rules replacing demonstration placeholders | `docs/care_gap_rules.md`, `rule_loader.py` approval guard |
-| Planned (P) | Full frontend consuming clinical APIs | Current scaffold in `frontend/app/page.tsx` |
+| Done | Read-only operator API and Next.js operator console | `backend/app/api/v1/operator.py`, `frontend/app/page.tsx` |
+| Planned (P) | Guarded clinical action endpoints with auth/RBAC | `FR-7.5`, `frontend/lib/api/operator.ts` is read-only |
 | Not found | A commit labelled chunk 7 is absent from history | `git log --oneline` |
 
 ---
