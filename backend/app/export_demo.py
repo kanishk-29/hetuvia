@@ -48,6 +48,7 @@ def _group(db: Session, model, source: str, *order):
 
 
 def build_export(db: Session, source: str, evaluated_on: date) -> dict:
+    """Export stored output; the reported evaluation date comes from the stored rows."""
     people = db.scalars(
         select(Person).where(Person.source_system == source).order_by(Person.source_record_id)
     ).all()
@@ -58,6 +59,19 @@ def build_export(db: Session, source: str, evaluated_on: date) -> dict:
     quality = _group(db, DataQualityFinding, source, DataQualityFinding.rule_code, DataQualityFinding.id)
     gaps = _group(db, CareGapFinding, source, CareGapFinding.rule_id, CareGapFinding.id)
     recs = _group(db, Recommendation, source, Recommendation.pathway_code, Recommendation.id)
+
+    stored_dates = {
+        value
+        for model in (CareGapFinding, DataQualityFinding, Recommendation)
+        for value in db.scalars(select(model.evaluated_on).where(model.source_system == source).distinct())
+    }
+    if len(stored_dates) > 1:
+        dates = ", ".join(sorted(d.isoformat() for d in stored_dates))
+        raise ValueError(
+            f"Stored output for source '{source}' has mixed evaluation dates: {dates}. "
+            "Rerun quality-check, care-gap-check and recommend with the same --date before exporting."
+        )
+    evaluated_on = next(iter(stored_dates), evaluated_on)
 
     out = []
     for p in people:

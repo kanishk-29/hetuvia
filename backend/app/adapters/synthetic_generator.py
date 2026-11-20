@@ -24,6 +24,7 @@ from app.db.models import (
     Person,
     ScreeningEvent,
 )
+from app.services.rule_loader import load_rules
 
 SOURCE = "synthetic"
 REFERENCE_DATE = date(2026, 11, 1)  # fixed on purpose: "today" must not change the population
@@ -66,7 +67,8 @@ class Population:
 
 
 def _age_years(born: date, on: date) -> int:
-    return (on - born).days // 365
+    """Calendar age, matching care_gap_engine.age_in_years (not an approximate days/365)."""
+    return on.year - born.year - ((on.month, on.day) < (born.month, born.day))
 
 
 def _prov(record_id: str | None = None) -> dict:
@@ -82,6 +84,7 @@ class _Builder:
     def __init__(self, seed: int) -> None:
         self.seed = seed
         self.rng = random.Random(seed)
+        self.rules = load_rules()
         self.pop = Population(seed=seed)
         for kind in PLANTED_KINDS:
             self.pop.planted[kind] = []
@@ -188,7 +191,7 @@ class _Builder:
         if stale_bp_person and bp_dates:
             self.pop.plant("stale_bp", person.person_id)  # only old readings exist
 
-        self._screenings(person, born, is_adult)
+        self._screenings(person, born)
 
     def _family_history(self, person: Person) -> None:
         rng = self.rng
@@ -317,9 +320,13 @@ class _Builder:
             )
         )
 
-    def _screenings(self, person: Person, born: date, is_adult: bool) -> None:
+    def _screenings(self, person: Person, born: date) -> None:
         rng = self.rng
-        kind = "demo_adult_screening" if is_adult else "demo_well_child_visit"
+        age = _age_years(born, REFERENCE_DATE)
+        kind = next((rule.service_type for rule in self.rules
+                     if rule.min_age_years <= age <= rule.max_age_years), None)
+        if kind is None:
+            return  # no demonstration rule covers this age band
         earliest = max(born + timedelta(days=30), date(2024, 1, 1))
         latest = REFERENCE_DATE + timedelta(days=90)
         for _ in range(rng.randint(1, 3)):

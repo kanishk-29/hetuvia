@@ -60,25 +60,41 @@ def load_rules(path: Path | str = DEFAULT_RULE_FILE) -> list[RuleDefinition]:
     return [RuleDefinition(**{**r.model_dump(), "exclusions": tuple(r.exclusions)}) for r in parsed.rules]
 
 
+def _rule_values(rule: RuleDefinition) -> dict:
+    """The mutable columns that define a rule version's meaning."""
+    return {
+        "title": rule.title,
+        "service_type": rule.service_type,
+        "status": RuleStatus(rule.status),
+        "min_age_years": rule.min_age_years,
+        "max_age_years": rule.max_age_years,
+        "interval_days": rule.interval_days,
+        "lead_days": rule.lead_days,
+        "grace_days": rule.grace_days,
+        "exclusions": list(rule.exclusions),
+        "effective_from": rule.effective_from,
+        "effective_to": rule.effective_to,
+        "source": rule.source,
+    }
+
+
 def sync_rules(db: Session, rules: list[RuleDefinition]) -> int:
-    """Insert or update by (rule_id, version). Safe to run repeatedly. Flushes; caller commits."""
+    """Insert new rule versions; never edit an existing version in place. Flushes; caller commits."""
     for rule in rules:
+        values = _rule_values(rule)
         row = db.scalars(select(GuidelineRule).where(
             GuidelineRule.rule_id == rule.rule_id, GuidelineRule.version == rule.version)).first()
         if row is None:
             row = GuidelineRule(rule_id=rule.rule_id, version=rule.version)
             db.add(row)
-        row.title = rule.title
-        row.service_type = rule.service_type
-        row.status = RuleStatus(rule.status)
-        row.min_age_years = rule.min_age_years
-        row.max_age_years = rule.max_age_years
-        row.interval_days = rule.interval_days
-        row.lead_days = rule.lead_days
-        row.grace_days = rule.grace_days
-        row.exclusions = list(rule.exclusions)
-        row.effective_from = rule.effective_from
-        row.effective_to = rule.effective_to
-        row.source = rule.source
+        else:
+            current = {name: getattr(row, name) for name in values}
+            if current != values:
+                raise ValueError(
+                    f"rule {rule.rule_id} v{rule.version} already exists with different content; "
+                    "bump the version instead of editing it in place"
+                )
+        for name, value in values.items():
+            setattr(row, name, value)
     db.flush()
     return len(rules)

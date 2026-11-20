@@ -443,7 +443,7 @@ function viewReview() {
   const list = all.filter(r => F.rpriority === 'all' || r.priority === F.rpriority)
     .sort((a, b) => PRIORITY[a.priority].rank - PRIORITY[b.priority].rank || (a.pid < b.pid ? -1 : 1));
   let sel = F.reviewSel && REC[F.reviewSel] ? REC[F.reviewSel] : null;
-  if (!sel || (F.reviewSel && list.indexOf(sel) < 0 && recStatus(sel) !== 'pending_review' && recStatus(sel) !== 'deferred' && false)) sel = list[0] || null;
+  if (!sel || (F.reviewSel && list.indexOf(sel) < 0)) sel = list[0] || null;
   if (sel) F.reviewSel = sel.id;
   const tab = (k, l) => `<button class="btn ${F.rpriority === k ? '' : 'ghost'} sm" data-act="rtab" data-k="${k}">${l}</button>`;
   const left = `<div class="card"><div class="filters">${tab('all', 'All (' + all.length + ')')}${tab('contact_now', 'Contact now')}${tab('review_data_first', 'Data first')}${tab('routine', 'Routine')}</div>

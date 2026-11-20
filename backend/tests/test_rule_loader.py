@@ -1,8 +1,11 @@
 import json
+from dataclasses import replace
 
 import pytest
+from sqlalchemy import func, select
 
-from app.services.rule_loader import DEFAULT_RULE_FILE, load_rules
+from app.db.models import GuidelineRule
+from app.services.rule_loader import DEFAULT_RULE_FILE, load_rules, sync_rules
 
 
 def write_variant(tmp_path, **changes):
@@ -38,3 +41,19 @@ def test_rule_without_a_real_source_is_refused(tmp_path):
 def test_unknown_exclusion_is_refused(tmp_path):
     with pytest.raises(ValueError):
         load_rules(write_variant(tmp_path, exclusions=["whatever"]))
+
+
+def test_sync_rules_is_idempotent(db):
+    rules = load_rules()
+    assert sync_rules(db, rules) == len(rules)
+    assert sync_rules(db, rules) == len(rules)
+    count = db.scalar(select(func.count()).select_from(GuidelineRule))
+    assert count == len(rules)
+
+
+def test_sync_rules_refuses_silent_edit_to_existing_version(db):
+    rules = load_rules()
+    sync_rules(db, rules)
+    changed = [replace(rules[0], interval_days=rules[0].interval_days + 1), *rules[1:]]
+    with pytest.raises(ValueError, match="bump the version"):
+        sync_rules(db, changed)

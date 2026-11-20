@@ -16,6 +16,14 @@ All notable changes to HETUVIA are documented here. The format follows Keep a Ch
 - Short stubs for `docs/product_scope.md`, `docs/api_contract.md` and `docs/rule_catalogue.md` that point to the relevant SRS sections.
 - `docs/demo/README.md` describing the demo entry point and data regeneration command.
 - A HETUVIA-specific `frontend/README.md`, replacing the `create-next-app` boilerplate.
+- Regression tests for rule-version immutability, export-date consistency and synthetic/rule alignment.
+
+### Fixed
+
+- `rule_loader.sync_rules` no longer silently edits an existing `(rule_id, version)` row; a changed rule payload must now bump the version.
+- The static demo review screen now falls back to a reviewable recommendation when a deep link points to one that is already approved or completed.
+- `export_demo` now reports the evaluation date actually stored in the findings and refuses to export mixed evaluation dates.
+- The synthetic generator now uses calendar ages and only creates screening types covered by the shipped rules; `docs/demo/data.js` was regenerated.
 
 ## [Baseline] - 2026-11-20
 

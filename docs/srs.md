@@ -508,19 +508,19 @@ The warning is a Starlette deprecation notice about `httpx` with `starlette.test
 
 All commits are on `main`, which tracks `origin/main`; there are no tags, stashes or additional local branches.
 
-## Appendix B — Baseline demo snapshot
+## Appendix B — Demo snapshot
 
-`docs/demo/data.js` at commit `5a6d9d7`:
+Current `docs/demo/data.js`, regenerated after aligning the synthetic generator with the shipped rules:
 
 | Metric | Value |
 |---|---|
 | Source | `synthetic` |
 | Evaluated on | 2026-11-01 |
-| Generated at | 2026-11-20T04:17:51+00:00 |
+| Generated at | 2026-11-20T10:24:55+00:00 |
 | Rule set | `demo_rules_v1` (2 rules) |
 | People | 300 |
-| Recommendations | 196 — 136 service, 60 information; all `pending_review` |
-| Care-gap findings | 162 — 126 `overdue`, 26 `not_assessable`, 10 `due` |
-| DQ findings | 337 |
-| DQ breakdown | DQ-001 7, DQ-002 11, DQ-003 42, DQ-005 169, DQ-006 52, DQ-007 19, DQ-008 27, DQ-009 10 |
+| Recommendations | 198 — 141 service, 57 information; all `pending_review` |
+| Care-gap findings | 173 — 132 `overdue`, 32 `not_assessable`, 9 `due` |
+| DQ findings | 309 |
+| DQ breakdown | DQ-001 12, DQ-002 15, DQ-003 40, DQ-005 139, DQ-006 52, DQ-007 15, DQ-008 19, DQ-009 17 |
 | DQ rules with no findings | DQ-004, DQ-010 |

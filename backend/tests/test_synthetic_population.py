@@ -2,9 +2,11 @@ from datetime import timedelta
 
 from sqlalchemy import func, select
 
-from app.adapters.synthetic_generator import PLANTED_KINDS, REFERENCE_DATE, generate_population
+from app.adapters.synthetic_generator import PLANTED_KINDS, REFERENCE_DATE, _age_years, generate_population
 from app.db.enums import ConditionContext, DataState
 from app.db.models import Condition, Person
+from app.services.care_gap_engine import age_in_years
+from app.services.rule_loader import load_rules
 from app.services.seed import seed_database
 
 
@@ -50,6 +52,27 @@ def test_every_planted_gap_type_exists():
     pop = generate_population(42)
     for kind in PLANTED_KINDS:
         assert pop.planted[kind], f"no people planted for {kind}"
+
+
+def test_generated_ages_and_screening_types_match_the_rules():
+    pop = generate_population(42)
+    rules = load_rules()
+    born_by_id = {p.person_id: p.date_of_birth for p in pop.people}
+    for person in pop.people:
+        if person.date_of_birth is not None:
+            assert _age_years(person.date_of_birth, REFERENCE_DATE) == age_in_years(
+                person.date_of_birth, REFERENCE_DATE
+            )
+    for screening in pop.screenings:
+        born = born_by_id[screening.person_id]
+        if born is None:
+            continue
+        age = age_in_years(born, REFERENCE_DATE)
+        assert any(
+            rule.service_type == screening.screening_type
+            and rule.min_age_years <= age <= rule.max_age_years
+            for rule in rules
+        )
 
 
 def test_seed_loads_into_database_and_repeats_cleanly(db):
