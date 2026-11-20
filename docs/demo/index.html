@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnVault — Your Second Brain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Mobile top bar -->
+  <header class="mobile-bar">
+    <button class="icon-btn" id="menuToggle" aria-label="Open menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="mobile-brand">
+      <span class="brand-mark">V</span>
+      <span>LearnVault</span>
+    </div>
+    <button class="icon-btn" id="themeToggleMobile" aria-label="Toggle theme">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </button>
+  </header>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">V</div>
+      <div class="brand-text">
+        <span class="brand-name">LearnVault</span>
+        <span class="brand-tag">Second Brain, Ledgered</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#dashboard" class="nav-link" data-route="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="12" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="16" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#topics" class="nav-link" data-route="topics">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span>Topics</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="text" id="globalSearch" placeholder="Search the vault…" autocomplete="off">
+    </div>
+    <div id="searchResults" class="search-results hidden"></div>
+
+    <div class="sidebar-footer">
+      <button class="theme-switch" id="themeToggle">
+        <span class="ts-icon">🌙</span>
+        <span class="ts-label">Dark mode</span>
+        <span class="ts-track"><span class="ts-thumb"></span></span>
+      </button>
+      <p class="sidebar-note">Stored locally on this device.<br>Nothing leaves your browser.</p>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main" id="main">
+
+    <!-- DASHBOARD -->
+    <section class="view" id="view-dashboard">
+      <div class="view-head">
+        <div>
+          <p class="eyebrow">Ledger — Overview</p>
+          <h1>Welcome back to the vault.</h1>
+          <p class="subhead">Here's the state of everything you've set out to learn.</p>
+        </div>
+        <button class="btn btn-primary" id="dashAddTopic">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          New Topic
+        </button>
+      </div>
+
+      <div class="stat-grid" id="statGrid"></div>
+
+      <div class="dash-columns">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Recently added</h2>
+            <a href="#topics" class="panel-link">View all topics →</a>
+          </div>
+          <div id="recentTopics" class="recent-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Progress by status</h2>
+          </div>
+          <div id="progressBreakdown" class="progress-breakdown"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOPICS -->
+    <section class="view" id="view-topics">
+      <div class="view-head">
+        <div>
+          <p class="eyebrow">The Catalog</p>
+          <h1>All topics.</h1>
+          <p class="subhead">Every subject you've filed away, in one drawer.</p>
+        </div>
+        <button class="btn btn-primary" id="topicsAddTopic">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          New Topic
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-field">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <input type="text" id="topicSearch" placeholder="Search by title or category…" autocomplete="off">
+        </div>
+        <select id="filterStatus" class="select">
+          <option value="all">All statuses</option>
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <select id="filterPriority" class="select">
+          <option value="all">All priorities</option>
+          <option value="High">High priority</option>
+          <option value="Medium">Medium priority</option>
+          <option value="Low">Low priority</option>
+        </select>
+      </div>
+
+      <div id="topicsGrid" class="topics-grid"></div>
+      <div id="topicsEmpty" class="empty-state hidden"></div>
+    </section>
+
+    <!-- TOPIC DETAIL -->
+    <section class="view" id="view-detail">
+      <button class="back-link" id="backToTopics">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to Topics
+      </button>
+
+      <div class="detail-head" id="detailHead"></div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="resources">Resources</button>
+        <button class="tab" data-tab="notes">Notes</button>
+      </div>
+
+      <div class="tab-panel" id="tab-resources">
+        <div class="tab-toolbar">
+          <p class="tab-hint">Everything you've stashed for this topic.</p>
+          <button class="btn btn-primary btn-sm" id="addResourceBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Add Resource
+          </button>
+        </div>
+        <div id="resourcesList" class="resources-list"></div>
+        <div id="resourcesEmpty" class="empty-state hidden"></div>
+      </div>
+
+      <div class="tab-panel hidden" id="tab-notes">
+        <div class="notes-wrap">
+          <textarea id="notesArea" placeholder="Jot down key concepts, formulas, questions, anything worth remembering…"></textarea>
+          <div class="notes-status" id="notesStatus">All notes saved locally.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- TOPIC MODAL -->
+<div class="modal-overlay hidden" id="topicModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 id="topicModalTitle">New Topic</h3>
+      <button class="icon-btn" id="closeTopicModal">✕</button>
+    </div>
+    <form id="topicForm" class="modal-body">
+      <label class="field">
+        <span>Title</span>
+        <input type="text" id="fTitle" placeholder="e.g. Remote Sensing" required>
+      </label>
+      <label class="field">
+        <span>Description</span>
+        <textarea id="fDescription" rows="3" placeholder="What is this topic about?"></textarea>
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>Category</span>
+          <input type="text" id="fCategory" placeholder="e.g. Geospatial, ML, DSA" required>
+        </label>
+        <label class="field">
+          <span>Priority</span>
+          <select id="fPriority">
+            <option>High</option>
+            <option selected>Medium</option>
+            <option>Low</option>
+          </select>
+        </label>
+      </div>
+      <label class="field">
+        <span>Status</span>
+        <select id="fStatus">
+          <option>Not Started</option>
+          <option>In Progress</option>
+          <option>Completed</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancelTopicModal">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveTopicBtn">Save Topic</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- RESOURCE MODAL -->
+<div class="modal-overlay hidden" id="resourceModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 id="resourceModalTitle">Add Resource</h3>
+      <button class="icon-btn" id="closeResourceModal">✕</button>
+    </div>
+    <form id="resourceForm" class="modal-body">
+      <label class="field">
+        <span>Resource Title</span>
+        <input type="text" id="rTitle" placeholder="e.g. NPTEL Remote Sensing Playlist" required>
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>Type</span>
+          <select id="rType">
+            <option>YouTube</option>
+            <option>Book</option>
+            <option>Research Paper</option>
+            <option>Website</option>
+            <option>GitHub</option>
+            <option>Notes</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>URL</span>
+          <input type="url" id="rUrl" placeholder="https://…">
+        </label>
+      </div>
+      <label class="field">
+        <span>Short Description</span>
+        <textarea id="rDescription" rows="2" placeholder="What will you find here?"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancelResourceModal">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveResourceBtn">Save Resource</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay hidden" id="confirmModalOverlay">
+  <div class="modal modal-sm" role="dialog" aria-modal="true">
+    <div class="modal-body confirm-body">
+      <div class="confirm-icon">!</div>
+      <h3 id="confirmTitle">Delete this item?</h3>
+      <p id="confirmMessage">This action can't be undone.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="confirmCancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmOk">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-stack" id="toastStack"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
