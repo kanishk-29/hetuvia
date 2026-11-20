@@ -99,7 +99,9 @@ async function apiGet<T>(path: string, params: Params = {}): Promise<T> {
     }
   }
   const suffix = query.toString();
-  const response = await fetch(`${API_URL}/api/v1${path}${suffix ? `?${suffix}` : ""}`);
+  const response = await fetch(`${API_URL}/api/v1${path}${suffix ? `?${suffix}` : ""}`, {
+    cache: "no-store",
+  });
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
     throw new Error(`${path} failed (${response.status})${detail ? `: ${detail}` : ""}`);

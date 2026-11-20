@@ -4,6 +4,7 @@ from datetime import date
 import pytest
 from fastapi.testclient import TestClient
 
+from app.adapters.synthetic_generator import REFERENCE_DATE
 from app.db.enums import (
     CareGapOutcome,
     DataState,
@@ -22,6 +23,11 @@ from app.db.models import (
 )
 from app.db.session import get_db
 from app.main import app
+from app.services.care_gap_runner import run_care_gap_check
+from app.services.dq_runner import run_quality_check
+from app.services.recommendation_runner import run_recommendations
+from app.services.review import review_recommendation
+from app.services.seed import seed_database
 
 SOURCE = "api_test"
 
@@ -177,3 +183,54 @@ def test_summary_reflects_stored_records(client, seeded):
 def test_invalid_pagination_is_rejected(client):
     assert client.get("/api/v1/people", params={"limit": 0}).status_code == 422
     assert client.get("/api/v1/recommendations", params={"offset": -1}).status_code == 422
+
+
+def test_full_pipeline_output_is_readable_through_the_api(client, db):
+    """Black-box integration: seed → quality-check → care-gap-check → recommend → review → API."""
+    seed_database(db, total_people=60)
+    run_quality_check(db, "synthetic", REFERENCE_DATE)
+    run_care_gap_check(db, "synthetic", REFERENCE_DATE)
+    expected = run_recommendations(db, "synthetic", REFERENCE_DATE)
+    db.flush()
+
+    summary = client.get("/api/v1/summary", params={"source": "synthetic"}).json()
+    assert summary["people"] == 60
+    assert summary["recommendations_by_status"]["pending_review"] == expected.open_total
+    assert summary["care_gap_findings"]  # the care-gap engine stored something
+    assert summary["data_quality_findings"]  # so did the data-quality engine
+    assert "DEMONSTRATION" in summary["label"]
+
+    first = client.get(
+        "/api/v1/recommendations", params={"source": "synthetic", "limit": 1}
+    ).json()
+    assert first["meta"]["total"] == expected.open_total
+    chosen = first["items"][0]
+
+    # A human decision recorded by the review service must be visible, filtered, and audited.
+    review_recommendation(db, uuid.UUID(chosen["id"]), "approve", "Dr Integration", "checked")
+    db.flush()
+
+    approved = client.get(
+        "/api/v1/recommendations", params={"source": "synthetic", "status": "approved"}
+    ).json()
+    assert approved["meta"]["total"] == 1
+    assert approved["items"][0]["id"] == chosen["id"]
+    assert approved["items"][0]["reviewer_name"] == "Dr Integration"
+
+    person = client.get(f"/api/v1/people/{chosen['person_id']}")
+    assert person.status_code == 200
+    assert person.json()["source_system"] == "synthetic"
+
+    audit = client.get(
+        "/api/v1/audit-events",
+        params={"person_id": chosen["person_id"], "action": "recommendation_approve"},
+    ).json()
+    assert audit["meta"]["total"] >= 1
+    assert any(item["object_id"] == chosen["id"] for item in audit["items"])
+
+    gaps = client.get(
+        "/api/v1/care-gap-findings",
+        params={"person_id": chosen["person_id"], "source": "synthetic"},
+    ).json()
+    assert gaps["meta"]["total"] >= 1
+    assert all(g["evidence"] for g in gaps["items"])  # evidence travels with the verdict

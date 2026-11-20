@@ -217,11 +217,12 @@ def validate_observation_row(row: dict[str, str | None], today: date) -> Validat
         except ValueError:
             result.add(RejectionReason.BAD_DATE, f"observed_at '{observed_text}' is not an ISO date or datetime")
         else:
-            if observed.tzinfo is None:
-                observed = observed.replace(tzinfo=UTC)
-            if observed.date() > today:
+            observed_utc = (
+                observed.astimezone(UTC) if observed.tzinfo is not None else observed.replace(tzinfo=UTC)
+            )
+            if observed_utc.date() > today:
                 result.add(RejectionReason.FUTURE_DATE, f"observed_at {observed_text} is in the future")
-            elif observed.date() < EARLIEST_PLAUSIBLE_DATE:
+            elif observed_utc.date() < EARLIEST_PLAUSIBLE_DATE:
                 result.add(RejectionReason.BAD_DATE, f"observed_at {observed_text} is implausibly early")
     result.values["observed_at"] = observed
     return result

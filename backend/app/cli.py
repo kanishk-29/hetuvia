@@ -14,9 +14,16 @@ from app.services.import_report import format_report
 from app.services.seed import reset_source
 
 
+def _date_arg(text: str) -> date:
+    try:
+        return date.fromisoformat(text)
+    except ValueError as problem:
+        raise argparse.ArgumentTypeError(f"invalid date '{text}': expected YYYY-MM-DD") from problem
+
+
 def _evaluation_date(args) -> date:
-    if args.date:
-        return date.fromisoformat(args.date)
+    if args.date is not None:
+        return args.date
     return REFERENCE_DATE if args.source == "synthetic" else date.today()
 
 
@@ -34,7 +41,7 @@ def main() -> None:
 
     check = sub.add_parser("quality-check", help="Run the data-quality rules and store the findings")
     check.add_argument("--source", default="synthetic")
-    check.add_argument("--date", help="Evaluation date, YYYY-MM-DD (synthetic data defaults to its fixed reference date)")
+    check.add_argument("--date", type=_date_arg, help="Evaluation date, YYYY-MM-DD (synthetic data defaults to its fixed reference date)")
 
     report = sub.add_parser("quality-report", help="Show one person's fields and data-quality findings")
     report.add_argument("person", help="The person's source record ID, for example SYN-0007")
@@ -42,7 +49,7 @@ def main() -> None:
 
     gaps = sub.add_parser("care-gap-check", help="Run the care-gap rules and store the findings")
     gaps.add_argument("--source", default="synthetic")
-    gaps.add_argument("--date", help="Evaluation date, YYYY-MM-DD (synthetic data defaults to its fixed reference date)")
+    gaps.add_argument("--date", type=_date_arg, help="Evaluation date, YYYY-MM-DD (synthetic data defaults to its fixed reference date)")
 
     gap_report = sub.add_parser("care-gap-report", help="Show one person's care-gap findings with their evidence")
     gap_report.add_argument("person", help="The person's source record ID, for example SYN-0007")

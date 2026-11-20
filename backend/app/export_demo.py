@@ -146,13 +146,21 @@ def build_export(db: Session, source: str, evaluated_on: date) -> dict:
     }
 
 
+def _date_arg(text: str) -> date:
+    try:
+        return date.fromisoformat(text)
+    except ValueError as problem:
+        raise argparse.ArgumentTypeError(f"invalid date '{text}': expected YYYY-MM-DD") from problem
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="python -m app.export_demo")
     parser.add_argument("--source", default="synthetic")
-    parser.add_argument("--date", help="Evaluation date, YYYY-MM-DD (synthetic defaults to its reference date)")
+    parser.add_argument("--date", type=_date_arg,
+                        help="Evaluation date, YYYY-MM-DD (synthetic defaults to its reference date)")
     parser.add_argument("--out", default="../docs/demo/data.js")
     args = parser.parse_args()
-    evaluated_on = date.fromisoformat(args.date) if args.date else (
+    evaluated_on = args.date if args.date is not None else (
         REFERENCE_DATE if args.source == "synthetic" else date.today())
 
     with get_session_factory()() as db:

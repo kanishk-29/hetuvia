@@ -106,3 +106,32 @@ def test_wrong_unit_is_rejected_not_converted():
 def test_unknown_observation_type_is_rejected():
     result = validate_observation_row(good_observation(observation_type="mystery"), TODAY)
     assert RejectionReason.UNKNOWN_TYPE in reasons(result)
+
+
+# --- observed_at must be compared in UTC, whatever offset the file used ---
+
+
+def test_offset_just_past_midnight_is_not_tomorrow_in_utc():
+    # 02 Nov 01:30 at +05:00 is still 01 Nov 20:30 UTC, so it is not in the future.
+    result = validate_observation_row(good_observation(observed_at="2026-11-02T01:30:00+05:00"), TODAY)
+    assert result.ok
+    assert result.values["observed_at"].isoformat() == "2026-11-02T01:30:00+05:00"  # the file's own time is kept
+
+
+def test_offset_that_really_is_tomorrow_in_utc_is_rejected():
+    # 02 Nov 20:30 at -05:00 is 03 Nov 01:30 UTC, one day past TODAY.
+    result = validate_observation_row(good_observation(observed_at="2026-11-02T20:30:00-05:00"), TODAY)
+    assert RejectionReason.FUTURE_DATE in reasons(result)
+
+
+def test_naive_timestamps_are_still_read_as_utc():
+    assert validate_observation_row(good_observation(observed_at="2026-11-01T23:59:00"), TODAY).ok
+    assert RejectionReason.FUTURE_DATE in reasons(
+        validate_observation_row(good_observation(observed_at="2026-11-02T00:01:00"), TODAY)
+    )
+
+
+def test_implausibly_early_timestamp_is_judged_in_utc():
+    # 31 Dec 1899 23:00 at +05:00 is 1899-12-31 18:00 UTC: before 1900-01-01.
+    result = validate_observation_row(good_observation(observed_at="1899-12-31T23:00:00+05:00"), TODAY)
+    assert RejectionReason.BAD_DATE in reasons(result)
