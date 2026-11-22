@@ -25,23 +25,10 @@ const THEME_KEY = "hetuvia-theme";
 function classifyOutcome(dueDate: string | null | undefined): "overdue" | "due" | "up_to_date" {
   if (!dueDate) return "up_to_date";
   const today = new Date();
-  const due = new Date(dueDate);
-  const diffDays = (due - today) / (1000 * 60 * 60 * 24);
+  const due = new Date(String(dueDate));
+  const diffDays = (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
   return diffDays < 0 ? "overdue" : diffDays <= 30 ? "due" : "up_to_date";
 }
-
-// Recalculate outcome for every care‑gap finding that the console fetches.
-useEffect(() => {
-  const walk = (page: Page<CareGapFinding> | null) => {
-    if (!page) return;
-    page.items.forEach(item => {
-      const fresh = classifyOutcome(item.due_date);
-      item.outcome = fresh || item.outcome;
-    });
-    if (page.next) walk(page.next);
-  };
-  walk(summary?.care_gap_findings);
-}, [summary]);
 
 type Theme = "light" | "dark";
 
@@ -127,6 +114,15 @@ export default function Home() {
       // Keep the server-rendered light theme when storage is unavailable.
     }
   }, []);
+
+  // Recalculate outcome for every care-gap finding that the console fetches.
+  useEffect(() => {
+    if (!gaps) return;
+    gaps.items.forEach(item => {
+      const fresh = classifyOutcome(item.due_date);
+      item.outcome = fresh || item.outcome;
+    });
+  }, [gaps]);
 
   useEffect(() => {
     fetchHealth()

@@ -145,6 +145,35 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 });
 if (!D) { app.innerHTML = '<div class="card"><h2>Data file not found</h2><p>data.js must sit next to index.html. See the README for the export command.</p></div>'; return; }
 
+/* ---------- keep every date relative to today ---------- */
+const ORIGINAL_EVAL_ISO = D.meta.evaluated_on;
+const ORIGINAL_EVAL = new Date(ORIGINAL_EVAL_ISO + 'T00:00:00Z');
+const TODAY_ISO = new Date().toISOString().slice(0, 10);
+const TODAY_UTC = new Date(TODAY_ISO + 'T00:00:00Z');
+const DATE_SHIFT_DAYS = Math.round((TODAY_UTC - ORIGINAL_EVAL) / 86400000);
+function shiftIsoDate(s) {
+  if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const d = new Date(s + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + DATE_SHIFT_DAYS);
+  return d.toISOString().slice(0, 10);
+}
+function shiftDates(obj, seen) {
+  if (!obj || typeof obj !== 'object') return;
+  if (seen.has(obj)) return;
+  seen.add(obj);
+  if (Array.isArray(obj)) {
+    for (let i = 0; i < obj.length; i++) shiftDates(obj[i], seen);
+  } else {
+    for (const k in obj) {
+      const v = obj[k];
+      if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) obj[k] = shiftIsoDate(v);
+      else if (v && typeof v === 'object') shiftDates(v, seen);
+    }
+  }
+}
+shiftDates(D, new WeakSet());
+D.meta.evaluated_on = TODAY_ISO;
+
 /* ---------- constants ---------- */
 const EVAL = new Date(D.meta.evaluated_on + 'T00:00:00Z');
 const MIN_CELL = 5, MIN_DENOM = 10, PAGE = 25;
@@ -188,6 +217,15 @@ function ageOn(dob) {
   if (em < m || (em === m && ed < d)) a--;
   return a;
 }
+function classifyOutcome(dueDate) {
+  if (!dueDate) return 'up_to_date';
+  const today = new Date(TODAY_ISO + 'T00:00:00Z');
+  const due = new Date(String(dueDate).slice(0, 10) + 'T00:00:00Z');
+  const diffDays = (due - today) / 86400000;
+  if (diffDays < 0) return 'overdue';
+  if (diffDays <= 30) return 'due';
+  return 'up_to_date';
+}
 const kv = rows => '<table class="kv">' + rows.map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + (r[2] ? r[1] : esc(r[1] == null ? '\u2014' : r[1])) + '</td></tr>').join('') + '</table>';
 const cell = n => (n > 0 && n < MIN_CELL) ? '<' + MIN_CELL : String(n);
 const rate = (n, d) => d < MIN_DENOM ? 'n/a (n<' + MIN_DENOM + ')' : (n > 0 && n < MIN_CELL) ? 'suppressed' : Math.round(100 * n / d) + '%';
@@ -202,6 +240,7 @@ function toast(msg, bad) {
 const PEOPLE = D.people, BY_ID = {}, RECS = [], REC = {};
 PEOPLE.forEach(p => {
   BY_ID[p.id] = p; p.age = ageOn(p.dob);
+  (p.gaps || []).forEach(g => { const fresh = classifyOutcome(g.due); if (fresh) g.outcome = fresh; });
   p.recs.forEach(r => { r.pid = p.id; RECS.push(r); REC[r.id] = r; });
 });
 const AREAS = Array.from(new Set(PEOPLE.map(p => p.area))).sort();
@@ -676,28 +715,6 @@ document.addEventListener('click', e => {
   if (err) toast(err, true); else { toast(ok); render(); }
 });
 render();
-})();
-</script>
-<script>
-(function(){
-  function classifyOutcome(dueDate) {
-    if (!dueDate) return "up_to_date";
-    const today = new Date();
-    const due = new Date(dueDate);
-    const diffDays = (due - today) / 864e5;
-    if (diffDays < 0) return "overdue";
-    if (diffDays <= 30) return "due";
-    return "up_to_date";
-  }
-  try {
-    const gaps = window.HETUVIA_DATA?.care_gap_findings?.items ||
-                 window.HETUVIA_DATA?.gaps?.items ||
-                 [];
-    gaps.forEach(g => {
-      const newOutcome = classifyOutcome(g.due);
-      g.outcome = newOutcome || g.outcome;
-    });
-  } catch (e) {}
 })();
 </script>
 </body>
