@@ -12,6 +12,7 @@ All notable changes to HETUVIA are documented here. The format follows Keep a Ch
 - Short stubs for `docs/product_scope.md`, `docs/api_contract.md` and `docs/rule_catalogue.md` that point to the relevant SRS sections.
 - `docs/README.md` describing the demo entry point and data regeneration command.
 - A HETUVIA-specific `frontend/README.md`, replacing the `create-next-app` boilerplate.
+- Neumorphic light/dark styling and a persistent theme toggle in both the Next.js operator console and the static demo, with contextual explanation cards and clearer labels.
 
 ### Changed
 
@@ -31,7 +32,8 @@ All notable changes to HETUVIA are documented here. The format follows Keep a Ch
 - CLI commands now reject malformed `--date` values and non-UUID recommendation ids with a clear argparse error and exit code 2 instead of a traceback.
 - The operator console and health check fetch with `cache: "no-store"`, so Refresh cannot be served a stale API response by the browser cache.
 - Demo references and the exporter default now match the `docs/` root layout used for deployment; the exported payload lands beside `index.html`.
-- Test count in `README.md` updated to 163.
+- Test count in `README.md` updated to 164.
+- Stale 125-test count in the static demo About view corrected to 163.
 
 ## [Baseline] - 2026-11-20
 

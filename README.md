@@ -133,7 +133,7 @@ py -m http.server 8001 --directory docs
 # visit http://localhost:8001/index.html
 ```
 
-`docs/.nojekyll` makes the folder usable with GitHub Pages. The demo keeps review/outreach interactions in the browser (`localStorage`) only; they do not write back to PostgreSQL.
+`docs/.nojekyll` makes the folder usable with GitHub Pages. The demo keeps review/outreach interactions in the browser (`localStorage`) only; they do not write back to PostgreSQL. Use the **Dark mode / Light mode** button in the header to switch themes; the choice is saved in `localStorage`.
 
 ### 7. Run the API and operator console
 

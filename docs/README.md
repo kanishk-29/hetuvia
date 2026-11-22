@@ -23,7 +23,7 @@ py -m http.server 8001 --directory docs
 # visit http://localhost:8001/
 ```
 
-Or open `docs/index.html` directly in a browser.
+Or open `docs/index.html` directly in a browser. The demo has a neumorphic light/dark design with a header theme toggle; the preference is stored under the `hetuvia-theme` `localStorage` key and applied before first paint.
 
 ## Safety and simulation boundary
 

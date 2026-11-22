@@ -4,86 +4,107 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>HETUVIA – Preventive care coordination (prototype)</title>
+<script>(function(){try{var t=localStorage.getItem("hetuvia-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>
 <style>
-:root{--bg:#f3f6f8;--card:#fff;--ink:#1c2b36;--muted:#5b6c79;--line:#dde5ea;--teal:#0f766e;--teal-d:#0b5a54;--teal-s:#dff3f0;
---amber:#92400e;--amber-s:#fef3c7;--violet:#5b21b6;--violet-s:#ede9fe;--green:#166534;--green-s:#dcfce7;--red:#b42318;--red-s:#fee4e2;
---blue:#1d4ed8;--blue-s:#dbeafe;--slate:#475569;--slate-s:#e8edf1}
+:root,:root[data-theme="light"]{color-scheme:light;--bg:#e8eef2;--surface:#eef3f6;--raised-surface:#f4f8fa;--inset-surface:#e2eaf0;
+--ink:#172b38;--muted:#4b6271;--faint:#647987;--line:rgba(124,150,168,.24);--accent:#0d6d66;--accent-d:#09534e;--accent-s:#d8efeb;
+--amber:#8a4b12;--amber-s:#f8e7cf;--violet:#5b21b6;--violet-s:#ece4fb;--green:#176b4a;--green-s:#d9efe4;--red:#a42b22;--red-s:#f8dfdc;
+--blue:#1d4ed8;--blue-s:#dde9fc;--slate:#41586a;--slate-s:#e2e9ef;--shadow-d:rgba(145,165,180,.58);--shadow-l:rgba(255,255,255,.95);
+--raised:7px 7px 15px var(--shadow-d),-7px -7px 15px var(--shadow-l);--raised-sm:4px 4px 9px var(--shadow-d),-4px -4px 9px var(--shadow-l);
+--inset:inset 4px 4px 8px var(--shadow-d),inset -4px -4px 8px var(--shadow-l);--ring:0 0 0 3px rgba(13,109,102,.3);
+--banner-bg:#12313a;--banner-ink:#e6f4f3}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#131c24;--surface:#1b2731;--raised-surface:#202e39;--inset-surface:#16212a;
+--ink:#e9f2f6;--muted:#adc1cd;--faint:#90a7b5;--line:rgba(163,190,207,.18);--accent:#63d9cc;--accent-d:#a3f0e7;--accent-s:#174541;
+--amber:#f0bc79;--amber-s:#42321f;--violet:#c4b5fd;--violet-s:#33285a;--green:#88d8ae;--green-s:#1c4030;--red:#ff9d95;--red-s:#462522;
+--blue:#93c5fd;--blue-s:#1e3554;--slate:#b8cbd6;--slate-s:#263540;--shadow-d:rgba(3,8,12,.68);--shadow-l:rgba(110,140,160,.15);
+--ring:0 0 0 3px rgba(99,217,204,.32);--banner-bg:#0a2429;--banner-ink:#d9f5f0}
 *{box-sizing:border-box}
-body{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
-a{color:var(--teal-d)}
-.banner{background:#102a43;color:#e6f0f7;font-size:12.5px;text-align:center;padding:6px 12px}
-header.top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-.top-in{max-width:1220px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:10px 20px;flex-wrap:wrap}
-.brand{font-weight:800;letter-spacing:.09em;color:var(--teal-d);font-size:19px;line-height:1.1}
+html{min-height:100%;background:var(--bg)}
+body{margin:0;min-height:100vh;font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+:focus-visible{outline:none;box-shadow:var(--ring)}
+a{color:var(--accent-d)}
+.banner{background:var(--banner-bg);color:var(--banner-ink);font-size:12.5px;text-align:center;padding:7px 12px;letter-spacing:.01em}
+header.top{background:var(--bg);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;box-shadow:0 6px 16px var(--shadow-d)}
+.top-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:10px 20px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:.09em;color:var(--accent-d);font-size:19px;line-height:1.1}
 .brand small{display:block;font-weight:500;letter-spacing:0;color:var(--muted);font-size:11px;margin-top:2px}
-nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
-nav a{padding:7px 12px;border-radius:8px;text-decoration:none;color:var(--slate);font-weight:600;font-size:14px}
-nav a:hover{background:var(--slate-s)}
-nav a.on{background:var(--teal-s);color:var(--teal-d)}
+nav{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+nav a{padding:8px 12px;border-radius:11px;text-decoration:none;color:var(--slate);font-weight:650;font-size:13.5px;box-shadow:0 0 0 1px transparent}
+nav a:hover{background:var(--slate-s);transform:translateY(-1px)}
+nav a.on{background:var(--accent-s);color:var(--accent-d);box-shadow:var(--inset)}
 .role{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
-select,input[type=text],textarea{font:inherit;padding:7px 10px;border:1px solid #c5d1d9;border-radius:8px;background:#fff;color:var(--ink)}
+.theme-toggle{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.theme-toggle .theme-sun,.theme-toggle .theme-moon,.theme-toggle .theme-label-light,.theme-toggle .theme-label-dark{display:none}
+:root[data-theme="light"] .theme-toggle .theme-moon,:root[data-theme="light"] .theme-toggle .theme-label-light{display:inline}
+:root[data-theme="dark"] .theme-toggle .theme-sun,:root[data-theme="dark"] .theme-toggle .theme-label-dark{display:inline}
+.context-strip{max-width:1280px;margin:16px auto 0;padding:0 20px;display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.context-strip div{border:1px solid var(--line);border-radius:13px;padding:10px 13px;background:var(--inset-surface);box-shadow:var(--inset);color:var(--muted);font-size:12.5px;line-height:1.45}
+.context-strip b{color:var(--ink)}
+select,input[type=text],textarea{font:inherit;padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:var(--inset-surface);box-shadow:var(--inset);color:var(--ink)}
 textarea{width:100%;min-height:72px;resize:vertical}
-main{max-width:1220px;margin:0 auto;padding:22px 20px 60px}
-h1{font-size:24px;margin:0 0 4px}
-h2{font-size:17px;margin:0 0 10px}
+main{max-width:1280px;margin:0 auto;padding:22px 20px 60px}
+h1{font-size:25px;margin:0 0 4px;letter-spacing:-.02em}
+h2{font-size:17px;margin:0 0 10px;letter-spacing:-.01em}
 h3{font-size:15px;margin:14px 0 6px}
-.sub{color:var(--muted);margin:0 0 18px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+.sub{color:var(--muted);margin:0 0 18px;font-size:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:17px 19px;margin-bottom:16px;box-shadow:var(--raised)}
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
 .g3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.kpis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:16px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.kpi b{display:block;font-size:26px;line-height:1.15}
+.kpis{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:16px}
+.kpi{background:var(--raised-surface);border:1px solid var(--line);border-radius:15px;padding:13px 15px;box-shadow:var(--raised-sm)}
+.kpi b{display:block;font-size:26px;line-height:1.15;color:var(--accent-d)}
 .kpi span{color:var(--muted);font-size:12.5px}
-.chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.chip{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
 .chip.amber{background:var(--amber-s);color:var(--amber)}.chip.violet{background:var(--violet-s);color:var(--violet)}
 .chip.slate{background:var(--slate-s);color:var(--slate)}.chip.green{background:var(--green-s);color:var(--green)}
-.chip.red{background:var(--red-s);color:var(--red)}.chip.blue{background:var(--blue-s);color:var(--blue)}.chip.teal{background:var(--teal-s);color:var(--teal-d)}
+.chip.red{background:var(--red-s);color:var(--red)}.chip.blue{background:var(--blue-s);color:var(--blue)}.chip.teal{background:var(--accent-s);color:var(--accent-d)}
 table{border-collapse:collapse;width:100%}
-th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}
-th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#fafcfd}
-tr.clickable{cursor:pointer}tr.clickable:hover td{background:#f5fbfa}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+tr.clickable{cursor:pointer}tr.clickable:hover td,tr.clickable:focus td{background:var(--accent-s)}
 table.kv td:first-child{color:var(--muted);width:38%}
 table.kv td{border-bottom:1px dashed var(--line);padding:5px 6px}
 .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.btn{font:inherit;font-weight:700;border:1px solid var(--teal);background:var(--teal);color:#fff;padding:8px 14px;border-radius:9px;cursor:pointer}
-.btn:hover{background:var(--teal-d)}
-.btn.ghost{background:#fff;color:var(--teal-d)}.btn.ghost:hover{background:var(--teal-s)}
-.btn.warn{background:#fff;color:var(--amber);border-color:#d9a441}.btn.danger{background:#fff;color:var(--red);border-color:#e0a09a}
-.btn[disabled]{opacity:.45;cursor:not-allowed}
-.btn.sm{padding:4px 10px;font-size:13px}
+.btn{font:inherit;font-weight:700;border:1px solid transparent;background:var(--accent);color:#fff;padding:9px 15px;border-radius:11px;cursor:pointer;box-shadow:var(--raised-sm);transition:transform 140ms ease,box-shadow 140ms ease,background 140ms ease}
+:root[data-theme="dark"] .btn{color:#08211e}
+.btn:hover{background:var(--accent-d);transform:translateY(-1px)}
+.btn:active{transform:translateY(0);box-shadow:var(--inset)}
+.btn.ghost{background:var(--surface);color:var(--accent-d)}.btn.ghost:hover{background:var(--accent-s)}
+.btn.warn{background:var(--amber-s);color:var(--amber);border-color:var(--line)}.btn.danger{background:var(--red-s);color:var(--red);border-color:var(--line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.btn.sm{padding:5px 11px;font-size:13px}
 .split{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
 @media(max-width:860px){.split{grid-template-columns:1fr}}
-.list{max-height:640px;overflow:auto}
+.list{max-height:640px;overflow:auto;background:var(--inset-surface);border-radius:13px;box-shadow:var(--inset)}
 .item{padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
-.item:hover{background:#f5fbfa}.item.sel{background:var(--teal-s)}
+.item:hover{background:var(--accent-s)}.item.sel{background:var(--accent-s);box-shadow:var(--inset)}
 .item small{color:var(--muted);display:block}
-.note{background:#f8fafb;border-left:4px solid var(--teal);padding:9px 12px;border-radius:6px;margin:8px 0;font-size:14px}
-.note.warn{border-color:#d9a441;background:#fffaf0}.note.viol{border-color:#8b5cf6;background:#faf7ff}
+.note{background:var(--inset-surface);border-left:4px solid var(--accent);padding:10px 12px;border-radius:9px;margin:8px 0;font-size:14px;box-shadow:var(--inset)}
+.note.warn{border-color:var(--amber);background:var(--amber-s);box-shadow:none}.note.viol{border-color:var(--violet);background:var(--violet-s);box-shadow:none}
 .muted{color:var(--muted)}.small{font-size:13px}
 .bar{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:14px}
 .bar .lab{width:150px;color:var(--slate)}
-.bar .track{flex:1;background:var(--slate-s);border-radius:6px;height:20px;overflow:hidden}
-.bar .fill{height:100%;background:var(--teal);border-radius:6px}
+.bar .track{flex:1;background:var(--inset-surface);border-radius:999px;height:20px;overflow:hidden;box-shadow:var(--inset)}
+.bar .fill{height:100%;background:var(--accent);border-radius:999px}
 .bar .val{width:48px;text-align:right;font-weight:700}
 .steps{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
-.step{padding:5px 11px;border-radius:999px;background:var(--slate-s);color:var(--slate);font-size:13px;font-weight:700}
-.step.done{background:var(--green-s);color:var(--green)}.step.now{background:var(--teal);color:#fff}
+.step{padding:5px 11px;border-radius:999px;background:var(--slate-s);color:var(--slate);font-size:13px;font-weight:700;box-shadow:var(--raised-sm)}
+.step.done{background:var(--green-s);color:var(--green)}.step.now{background:var(--accent);color:#fff}
 .tl{border-left:3px solid var(--line);margin-left:6px;padding-left:14px}
 .tl .ev{position:relative;padding:5px 0 8px}
-.tl .ev:before{content:"";position:absolute;left:-21px;top:11px;width:10px;height:10px;border-radius:50%;background:#9db3c0}
-.tl .ev.miss:before{background:#8b5cf6}
+.tl .ev:before{content:"";position:absolute;left:-21px;top:11px;width:10px;height:10px;border-radius:50%;background:var(--slate)}
+.tl .ev.miss:before{background:var(--violet)}
 .tl .d{font-weight:700;font-size:13px;color:var(--slate)}
 .pager{display:flex;gap:10px;align-items:center;margin-top:10px}
 .empty{color:var(--muted);padding:18px;text-align:center}
-pre{background:#f6f8fa;border:1px solid var(--line);padding:10px;border-radius:8px;overflow:auto;font-size:12px;max-height:260px}
-footer{max-width:1220px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:12.5px}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#102a43;color:#fff;padding:10px 16px;border-radius:10px;display:none;z-index:20;max-width:90vw}
-#toast.bad{background:var(--red)}
-.msg{background:#f3f8ff;border:1px dashed #9dbbe8;border-radius:10px;padding:10px 12px;white-space:pre-wrap;font-size:14px}
+pre{background:var(--inset-surface);border:1px solid var(--line);padding:10px;border-radius:10px;overflow:auto;font-size:12px;max-height:260px;box-shadow:var(--inset)}
+footer{max-width:1280px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:12.5px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--banner-bg);color:var(--banner-ink);padding:10px 16px;border-radius:12px;display:none;z-index:20;max-width:90vw;box-shadow:var(--raised)}
+#toast.bad{background:var(--red);color:#fff}
+.msg{background:var(--blue-s);border:1px dashed var(--line);border-radius:11px;padding:10px 12px;white-space:pre-wrap;font-size:14px}
 label.inline{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:14px}
-.slot{display:inline-block;margin:4px 6px 4px 0}
+.slot{display:inline-block;margin:4px 6px 4px 0;padding:7px 9px;border-radius:9px;background:var(--surface);box-shadow:var(--raised-sm)}
 .slot input{margin-right:5px}
 </style>
 </head>
@@ -93,7 +114,15 @@ label.inline{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:
   <div class="brand">HETUVIA<small>Population health intelligence &amp; preventive care coordination</small></div>
   <nav id="nav"></nav>
   <div class="role"><label for="role">Viewing as</label><select id="role"></select></div>
+  <button type="button" class="btn ghost sm theme-toggle" id="themeToggle" aria-label="Toggle colour theme">
+    <span class="theme-sun" aria-hidden="true">☀</span><span class="theme-moon" aria-hidden="true">☾</span><span class="theme-label-light">Dark mode</span><span class="theme-label-dark">Light mode</span>
+  </button>
 </div></header>
+<div class="context-strip">
+  <div><b>What this is.</b> An interactive walkthrough of a fictional preventive-care workflow.</div>
+  <div><b>What you can do.</b> Review a proposal and simulate outreach; the numbers and audit log update as you go.</div>
+  <div><b>What stays here.</b> Actions are stored in this browser only. Nothing is sent and no care is delivered.</div>
+</div>
 <main id="app"><div class="card">Loading&hellip;</div></main>
 <footer>HETUVIA is a competition prototype. Every person, record and result shown is fictional. Rules are demonstration placeholders. HETUVIA coordinates preventive care and does not diagnose; a human reviewer stays responsible for every decision. Nothing is sent to anyone.</footer>
 <div id="toast"></div>
@@ -104,6 +133,12 @@ label.inline{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:
 'use strict';
 const D = window.HETUVIA_DATA;
 const app = document.getElementById('app');
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('hetuvia-theme', next); } catch (e) { /* private browsing */ }
+});
 if (!D) { app.innerHTML = '<div class="card"><h2>Data file not found</h2><p>data.js must sit next to index.html. See the README for the export command.</p></div>'; return; }
 
 /* ---------- constants ---------- */
@@ -558,7 +593,7 @@ function viewAbout() {
     <li><b>Evidence on every finding:</b> rule, version, facts and time.</li>
     <li><b>Small-cell suppression</b> and denominators on group statistics.</li>
     <li><b>No real messages.</b> Invitations are simulated, behind a recorded consent check.</li></ul></div>
-  <div class="card"><h2>How it is built</h2><p>Python engines (data quality, care gaps, pathways) on PostgreSQL, tested by an automated suite of 125 tests, including a check that the data-quality engine finds every gap deliberately planted in the generated population. This page is a read-only export of the engines&rsquo; output for the generated population, with the workflow (review, outreach, attendance) simulated in your browser.</p>
+  <div class="card"><h2>How it is built</h2><p>Python engines (data quality, care gaps, pathways) on PostgreSQL, tested by an automated suite of 164 tests, including a check that the data-quality engine finds every gap deliberately planted in the generated population. This page is a read-only export of the engines&rsquo; output for the generated population, with the workflow (review, outreach, attendance) simulated in your browser.</p>
     <p class="muted small">Export: ${esc(D.meta.generated_at)} &middot; evaluation date ${esc(D.meta.evaluated_on)} &middot; rules ${esc(D.meta.rule_set)}.</p></div>
   <div class="card"><h2>Rules in use (demonstration)</h2>${(D.rules || []).map(r => '<h3>' + esc(r.rule_id) + ' v' + esc(r.version) + '</h3>' + kv([['Service', r.title], ['Eligible ages', r.min_age + ' to ' + r.max_age], ['Interval', r.interval_days + ' days'], ['Due window', r.lead_days + ' days early, ' + r.grace_days + ' days grace'], ['Status', r.status]]) + '<div class="muted small">' + esc(r.source) + '</div>').join('')}</div>
   </div>`;
