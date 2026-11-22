@@ -417,7 +417,7 @@ export default function Home() {
                         {personLabel(gap.person_id)}
                       </button>
                     </td>
-                    <td>{gap.service_type.replace(/_/g, " ")}</td>
+                    <td>{gap.rule_id} v{gap.rule_version}</td>
                     <td><Badge value={gap.outcome} /></td>
                     <td>{gap.age_years ?? "—"}</td>
                     <td>{gap.due_date ?? "—"}</td>

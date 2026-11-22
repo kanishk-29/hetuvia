@@ -91,6 +91,8 @@ table.kv td{border-bottom:1px dashed var(--line);padding:5px 6px}
 .steps{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
 .step{padding:5px 11px;border-radius:999px;background:var(--slate-s);color:var(--slate);font-size:13px;font-weight:700;box-shadow:var(--raised-sm)}
 .step.done{background:var(--green-s);color:var(--green)}.step.now{background:var(--accent);color:#fff}
+/* dark‑mode contrast fix – white on #63d9cc is ~1.7:1, so darken the text */
+:root[data-theme="dark"] .step.now { color: #08211e; }
 .tl{border-left:3px solid var(--line);margin-left:6px;padding-left:14px}
 .tl .ev{position:relative;padding:5px 0 8px}
 .tl .ev:before{content:"";position:absolute;left:-21px;top:11px;width:10px;height:10px;border-radius:50%;background:var(--slate)}
@@ -102,6 +104,8 @@ pre{background:var(--inset-surface);border:1px solid var(--line);padding:10px;bo
 footer{max-width:1280px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:12.5px}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--banner-bg);color:var(--banner-ink);padding:10px 16px;border-radius:12px;display:none;z-index:20;max-width:90vw;box-shadow:var(--raised)}
 #toast.bad{background:var(--red);color:#fff}
+/* dark‑mode contrast fix – white on #ff9d95 is ~2:1, so use a darker text */
+:root[data-theme="dark"] #toast.bad { color: #08211e; }
 .msg{background:var(--blue-s);border:1px dashed var(--line);border-radius:11px;padding:10px 12px;white-space:pre-wrap;font-size:14px}
 label.inline{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:14px}
 .slot{display:inline-block;margin:4px 6px 4px 0;padding:7px 9px;border-radius:9px;background:var(--surface);box-shadow:var(--raised-sm)}
