@@ -678,5 +678,27 @@ document.addEventListener('click', e => {
 render();
 })();
 </script>
+<script>
+(function(){
+  function classifyOutcome(dueDate) {
+    if (!dueDate) return "up_to_date";
+    const today = new Date();
+    const due = new Date(dueDate);
+    const diffDays = (due - today) / 864e5;
+    if (diffDays < 0) return "overdue";
+    if (diffDays <= 30) return "due";
+    return "up_to_date";
+  }
+  try {
+    const gaps = window.HETUVIA_DATA?.care_gap_findings?.items ||
+                 window.HETUVIA_DATA?.gaps?.items ||
+                 [];
+    gaps.forEach(g => {
+      const newOutcome = classifyOutcome(g.due);
+      g.outcome = newOutcome || g.outcome;
+    });
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>
