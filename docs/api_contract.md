@@ -15,4 +15,4 @@ The HTTP interface is specified in [the SRS](srs.md) section 7.2. The backend is
 
 All operator endpoints are read-only. Clinical action endpoints (review, import, reset) are out of scope until authentication and authorisation exist. Response schemas are defined in `backend/app/api/v1/schemas.py`.
 
-The Next.js console consumes this API through `frontend/lib/api/operator.ts`. The static demo at `docs/demo/index.html` is separate and reads generated data files only.
+The Next.js console consumes this API through `frontend/lib/api/operator.ts`. The static demo at `docs/index.html` is separate and reads generated data files only.

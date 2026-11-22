@@ -16,8 +16,8 @@ HETUVIA loads a synthetic (or CSV-supplied) population, checks record quality, e
 | Backend domain, engines, CLI | [`backend/app/`](backend/app/) | Data models, CSV/synthetic adapters, data-quality and care-gap engines, recommendation engine, review service, audit log, demo exporter |
 | Rules | [`backend/rules/demo_rules_v1.json`](backend/rules/demo_rules_v1.json) | The only shipped rule set: two demonstration screening rules |
 | Database | [`backend/migrations/`](backend/migrations/) | Six Alembic revisions creating 13 tables |
-| Tests | [`backend/tests/`](backend/tests/) | 125 automated tests, including answer-key grading of planted data gaps |
-| Static demo | [`docs/demo/`](docs/demo/) | `index.html` + generated `data.js` — the actual HETUVIA demo UI |
+| Tests | [`backend/tests/`](backend/tests/) | 163 automated tests, including answer-key grading of planted data gaps |
+| Static demo | [`docs/`](docs/) | `index.html` + generated `data.js` — the actual HETUVIA demo UI |
 | Operator console | [`frontend/`](frontend/) | Next.js read-only console consuming the operator API |
 | Documentation | [`docs/`](docs/) | Software requirements, rule catalogues, import format, data dictionary |
 
@@ -43,7 +43,7 @@ recommend ─────────► recommendations (all pending_review)
 review ────────────► audit_events (approve / defer / reject)
         │
         ▼
-export_demo ───────► docs/demo/data.js ──► docs/demo/index.html
+export_demo ───────► docs/data.js ──► docs/index.html
 ```
 
 Core safety rules enforced in code:
@@ -123,14 +123,14 @@ Valid decisions: `approve`, `defer`, `reject`. A note is required for `defer` an
 ### 6. Regenerate the static demo
 
 ```powershell
-.\.venv\Scripts\python.exe -m app.export_demo --source synthetic --out ..\docs\demo\data.js
+.\.venv\Scripts\python.exe -m app.export_demo --source synthetic --out ..\docs\data.js
 ```
 
-Then open **`docs/demo/index.html`** in a browser, or serve the `docs/` folder with any static server:
+Then open **`docs/index.html`** in a browser, or serve the `docs/` folder with any static server:
 
 ```powershell
 py -m http.server 8001 --directory docs
-# visit http://localhost:8001/demo/index.html
+# visit http://localhost:8001/index.html
 ```
 
 `docs/.nojekyll` makes the folder usable with GitHub Pages. The demo keeps review/outreach interactions in the browser (`localStorage`) only; they do not write back to PostgreSQL.
@@ -158,7 +158,7 @@ The API exposes `GET /api/v1/health` plus read-only operator endpoints for summa
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-Baseline: **125 passed** (one non-fatal Starlette/httpx deprecation warning). Tests require the PostgreSQL instance to be running because several tests exercise real migrations and persistence.
+Current suite: **163 passed** (one non-fatal Starlette/httpx deprecation warning). Tests require the PostgreSQL instance to be running because several tests exercise real migrations and persistence.
 
 ---
 
@@ -175,7 +175,7 @@ Baseline: **125 passed** (one non-fatal Starlette/httpx deprecation warning). Te
 | `python -m app.cli reset-source <name>` / `reset-synthetic` | Delete everything loaded by one source; audit events survive |
 | `python -m app.workflow_cli recommend [--source synthetic] [--date YYYY-MM-DD]` | Create/update/reopen/close recommendations |
 | `python -m app.workflow_cli review <id> --decision <d> --reviewer <name> [--note <text>]` | Record a human decision |
-| `python -m app.export_demo [--source synthetic] [--date ...] [--out ../docs/demo/data.js]` | Export stored output as `window.HETUVIA_DATA` for the static demo |
+| `python -m app.export_demo [--source synthetic] [--date ...] [--out ../docs/data.js]` | Export stored output as `window.HETUVIA_DATA` for the static demo |
 
 Run these from `backend/` with the virtual environment active.
 
@@ -189,9 +189,9 @@ Run these from `backend/` with the virtual environment active.
 - [CSV import format](docs/import_format.md)
 - [Data dictionary](docs/data_dictionary.md)
 - [Demonstration rule set](backend/rules/demo_rules_v1.json)
-- [Demo data contract / generated file](docs/demo/data.js)
+- [Demo data contract / generated file](docs/data.js)
 
-The files `docs/product_scope.md`, `docs/api_contract.md` and `docs/rule_catalogue.md` are historical empty placeholders; the SRS is the maintained specification.
+The files `docs/product_scope.md`, `docs/api_contract.md` and `docs/rule_catalogue.md` are short pointers to the maintained specification; the SRS is authoritative.
 
 ---
 
@@ -215,7 +215,7 @@ The repository was built incrementally, one commit per chunk:
 
 ## Repository notes
 
-- The demo entry point is **`docs/demo/index.html`**. An unrelated LearnVault template and a duplicate demo filename were removed.
+- The demo entry point is **`docs/index.html`**. An unrelated LearnVault template and a duplicate demo filename were removed.
 - `backend/requirements.txt` is UTF-8 without a BOM. It was converted from UTF-16LE during the baseline cleanup; all pinned versions are unchanged.
 - `frontend/AGENTS.md` is generated by `next dev`. When writing frontend code, follow it: read the relevant Next.js 16.4.6 guide under `frontend/node_modules/next/dist/docs/` first.
 - No `.env` with real secrets is committed; `backend/.env` may exist locally and matches `.env.example`.

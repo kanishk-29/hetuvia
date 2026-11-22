@@ -1,7 +1,7 @@
 """Export the engines' stored output for one source as a static data file for the demo page.
 
 Run from the backend folder with the venv active:
-    python -m app.export_demo --out ../docs/demo/data.js
+    python -m app.export_demo --out ../docs/data.js
 Run quality-check, care-gap-check and recommend first, so there is something to export.
 """
 
@@ -30,6 +30,9 @@ from app.services.rule_loader import load_rules
 
 LABEL = ("DEMONSTRATION: 100% fictional data and placeholder rules. "
          "Not an Abu Dhabi guideline and not clinical advice.")
+
+# The demo is served from the docs/ root (GitHub Pages), so data.js must sit beside index.html.
+DEFAULT_EXPORT_PATH = "../docs/data.js"
 
 
 def _iso(value: date | None) -> str | None:
@@ -158,7 +161,7 @@ def main() -> None:
     parser.add_argument("--source", default="synthetic")
     parser.add_argument("--date", type=_date_arg,
                         help="Evaluation date, YYYY-MM-DD (synthetic defaults to its reference date)")
-    parser.add_argument("--out", default="../docs/demo/data.js")
+    parser.add_argument("--out", default=DEFAULT_EXPORT_PATH)
     args = parser.parse_args()
     evaluated_on = args.date if args.date is not None else (
         REFERENCE_DATE if args.source == "synthetic" else date.today())

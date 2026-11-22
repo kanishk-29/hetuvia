@@ -1,10 +1,11 @@
 from datetime import date
+from pathlib import Path
 
 import pytest
 
 from app.db.enums import OutreachPriority, RecommendationKind, RecommendationStatus
 from app.db.models import Person, Recommendation
-from app.export_demo import build_export
+from app.export_demo import DEFAULT_EXPORT_PATH, build_export
 
 SOURCE = "export_test"
 
@@ -55,3 +56,15 @@ def test_export_refuses_mixed_stored_evaluation_dates(db):
 
     with pytest.raises(ValueError, match="mixed evaluation dates"):
         build_export(db, SOURCE, date(2026, 11, 1))
+
+
+def test_default_export_lands_beside_the_served_demo_page():
+    """White-box layout check: GitHub Pages serves docs/, so data.js must land there too."""
+    repo_root = Path(__file__).resolve().parents[2]
+    from_backend = (repo_root / "backend" / DEFAULT_EXPORT_PATH).resolve()
+
+    assert from_backend == (repo_root / "docs" / "data.js").resolve()
+    assert from_backend.is_file()
+    demo_page = (repo_root / "docs" / "index.html").resolve()
+    assert demo_page.is_file()
+    assert 'src="data.js"' in demo_page.read_text(encoding="utf-8")

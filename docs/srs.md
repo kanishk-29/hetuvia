@@ -55,7 +55,7 @@ Priority legend used in Section 3: **M** = mandatory for the current prototype a
 - `docs/dq_rule_catalogue.md` — data-quality rule catalogue, version `demo-1`.
 - `docs/import_format.md` — CSV column and validation contract.
 - `docs/data_dictionary.md` — synthetic population and planted-gap answer key.
-- `docs/demo/index.html`, `docs/demo/data.js` — static demo and generated payload.
+- `docs/index.html`, `docs/data.js` — static demo and generated payload.
 - Commit history `b372add` through `5a6d9d7` (13 commits, chunks 1–6b and 8 plus demo).
 
 ---
@@ -68,7 +68,7 @@ HETUVIA is a backend-centred prototype with three presentation surfaces:
 
 1. **CLI workflows** are the primary operator interface. They load data, run engines, review recommendations and export the demo payload.
 2. **FastAPI service** exposes read-only operator endpoints used by the Next.js console; clinical actions remain CLI-only until auth/RBAC exists.
-3. **Static demo** (`docs/demo/index.html`) reads `data.js` and renders work queues, person detail, simulated review/outreach, insights and an in-browser audit log. It requires no running backend.
+3. **Static demo** (`docs/index.html`) reads `data.js` and renders work queues, person detail, simulated review/outreach, insights and an in-browser audit log. It requires no running backend.
 
 The engines are separated into pure functions (`dq_rules.py`, `care_gap_engine.py`, `recommendation_engine.py`) and persistence orchestrators (`dq_runner.py`, `care_gap_runner.py`, `recommendation_runner.py`). This keeps decisions deterministic and testable without a database.
 
@@ -76,7 +76,7 @@ The engines are separated into pure functions (`dq_rules.py`, `care_gap_engine.p
 
 | User class | Needs | Interface |
 |---|---|---|
-| Demonstration visitor | Explore a fictional population and understand safeguards without clinical risk | `docs/demo/index.html` |
+| Demonstration visitor | Explore a fictional population and understand safeguards without clinical risk | `docs/index.html` |
 | Data operator | Seed or import data, run checks, inspect reports, reset a source | `python -m app.cli` |
 | Clinical reviewer | See proposed pathways with evidence and record approve/defer/reject decisions | `python -m app.workflow_cli review`, demo review screen (simulated) |
 | Developer / tester | Reproducible fixtures, pure rule functions, automated verification | Pytest suite, Alembic migrations, documented CLI |
@@ -202,9 +202,9 @@ The engines are separated into pure functions (`dq_rules.py`, `care_gap_engine.p
 
 - **FR-6.2 — M — Payload.** The export shall contain `meta` (source, evaluation date, generation timestamp, `rule_set = demo_rules_v1` and the demonstration warning label), the loaded `rules`, and a `people` array with nested encounters, observations, screenings, conditions, DQ findings, care-gap findings and recommendations including evidence.
 
-- **FR-6.3 — M — Output format.** The exporter shall write compact UTF-8 JSON to `docs/demo/data.js` prefixed with `window.HETUVIA_DATA=` and suffixed with `;`.
+- **FR-6.3 — M — Output format.** The exporter shall write compact UTF-8 JSON to `docs/data.js` prefixed with `window.HETUVIA_DATA=` and suffixed with `;`.
 
-- **FR-6.4 — M — Demo views.** `docs/demo/index.html` shall render: overview, work queue, person detail, recommendation review, outreach and appointments, community insights, audit log, and about/safeguards. It shall support filtering by area, priority, kind and status and searching by person ID.
+- **FR-6.4 — M — Demo views.** `docs/index.html` shall render: overview, work queue, person detail, recommendation review, outreach and appointments, community insights, audit log, and about/safeguards. It shall support filtering by area, priority, kind and status and searching by person ID.
 
 - **FR-6.5 — M — Simulation boundary.** Review decisions, consent confirmation, appointment choices and the demo audit log are stored in browser `localStorage`, keyed to the generated-data signature. They are demonstrations only and do not persist to the API or database.
 
@@ -451,7 +451,7 @@ The warning is a Starlette deprecation notice about `httpx` with `starlette.test
 | FR-2 | `services/dq_rules.py`, `services/dq_runner.py` | `test_dq_rules.py`, `test_dq_grading.py`, `test_dq_table.py` |
 | FR-3 / FR-5 | `rules/demo_rules_v1.json`, `services/rule_loader.py`, `services/care_gap_engine.py`, `services/care_gap_runner.py` | `test_rule_loader.py`, `test_care_gap_engine.py`, `test_care_gap_runner.py`, `test_care_gap_tables.py` |
 | FR-4 | `services/pathways.py`, `services/recommendation_engine.py`, `services/recommendation_runner.py`, `services/review.py`, `services/audit.py` | `test_recommendation_engine.py`, `test_recommendation_runner.py` |
-| FR-6 | `app/export_demo.py`, `docs/demo/index.html`, `docs/demo/data.js` | Export command preconditions; manual demo smoke check |
+| FR-6 | `app/export_demo.py`, `docs/index.html`, `docs/data.js` | Export command preconditions; manual demo smoke check |
 | FR-7 | `app/main.py`, `api/v1/health.py`, `frontend/app/page.tsx`, `frontend/lib/api/health.ts` | `test_health.py` |
 | NFR-1 / NFR-3 | Pure engines and `db/enums.py` CHECK constraints | DQ grading, care-gap engine, database tests |
 
@@ -464,7 +464,7 @@ The warning is a Starlette deprecation notice about `httpx` with `starlette.test
 5. **Priority is not urgency.** An overdue service recommendation is `contact_now` but still `pending_review` and carries the non-urgency statement.
 6. **Human decision is durable.** After review, status and reviewer fields change and an `audit_events` row is written.
 7. **Need resolution keeps history.** Re-running after the gap disappears closes the recommendation rather than deleting it; recurrence reopens it with a new audit entry.
-8. **Demo is self-contained.** Opening `docs/demo/index.html` with `data.js` present renders without API calls; browser-local review state does not alter the database.
+8. **Demo is self-contained.** Opening `docs/index.html` with `data.js` present renders without API calls; browser-local review state does not alter the database.
 
 ---
 
@@ -478,7 +478,7 @@ The warning is a Starlette deprecation notice about `httpx` with `starlette.test
 6. The Next.js frontend is a read-only operator console, not an authenticated user application.
 7. CSV units are validated but never converted; unknown units cause rejection.
 8. People are never merged by demographic similarity.
-9. The demo entry point is `docs/demo/index.html`; earlier revisions also contained an unrelated template and a duplicate demo filename.
+9. The demo entry point is `docs/index.html`; earlier revisions also contained an unrelated template and a duplicate demo filename.
 10. `docs/product_scope.md` remains a placeholder; `docs/api_contract.md` documents the read-only HTTP interface and `docs/rule_catalogue.md` points to the maintained rule references. This SRS is authoritative for requirements.
 
 ---
@@ -520,7 +520,7 @@ All commits are on `main`, which tracks `origin/main`; there are no tags, stashe
 
 ## Appendix B — Demo snapshot
 
-Current `docs/demo/data.js`, regenerated after aligning the synthetic generator with the shipped rules:
+Current `docs/data.js`, regenerated after aligning the synthetic generator with the shipped rules:
 
 | Metric | Value |
 |---|---|
